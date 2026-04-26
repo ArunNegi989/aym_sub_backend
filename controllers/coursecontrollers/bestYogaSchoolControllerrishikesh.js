@@ -15,16 +15,25 @@ const parseJSON = (val) => {
    EXTRACT FILES
 ========================= */
 const extractImages = (files) => {
-  const hero = "";
+  let heroImage = "";
+  let mediaMainImage = "";
+  const mediaSmallImages = {};
   const accredImages = {};
   const courseImages = {};
   const specialtyImages = {};
 
-  let heroImage = "";
-
   files.forEach((file) => {
     if (file.fieldname === "heroImage") {
       heroImage = "/uploads/" + file.filename;
+    }
+    
+    if (file.fieldname === "mediaMainImage") {
+      mediaMainImage = "/uploads/" + file.filename;
+    }
+
+    if (file.fieldname.startsWith("mediaSmallImage_")) {
+      const index = file.fieldname.replace("mediaSmallImage_", "");
+      mediaSmallImages[index] = "/uploads/" + file.filename;
     }
 
     if (file.fieldname.startsWith("accredImg_")) {
@@ -43,7 +52,7 @@ const extractImages = (files) => {
     }
   });
 
-  return { heroImage, accredImages, courseImages, specialtyImages };
+  return { heroImage, mediaMainImage, mediaSmallImages, accredImages, courseImages, specialtyImages };
 };
 
 /* =========================
@@ -59,12 +68,15 @@ exports.create = async (req, res) => {
       });
     }
 
-    const { heroImage, accredImages, courseImages, specialtyImages } =
+    const { heroImage, mediaMainImage, mediaSmallImages, accredImages, courseImages, specialtyImages } =
       extractImages(req.files || []);
 
     let accredBadges = parseJSON(req.body.accredBadges);
     let courseCards = parseJSON(req.body.courseCards);
     let specialtyCourses = parseJSON(req.body.specialtyCourses);
+    let mediaSmallImagesArray = parseJSON(req.body.mediaSmallImages) || [];
+    let trainingTags = parseJSON(req.body.trainingTags);
+    let pillsItems = parseJSON(req.body.pillsItems);
 
     // map images
     accredBadges = accredBadges.map((item) => ({
@@ -80,6 +92,12 @@ exports.create = async (req, res) => {
     specialtyCourses = specialtyCourses.map((item) => ({
       ...item,
       imgUrl: specialtyImages[item.id] || item.imgUrl || "",
+    }));
+
+    // Map media small images
+    mediaSmallImagesArray = mediaSmallImagesArray.map((item, index) => ({
+      ...item,
+      imgUrl: mediaSmallImages[index] || item.imgUrl || "",
     }));
 
     const data = {
@@ -100,6 +118,29 @@ exports.create = async (req, res) => {
 
       inlineLinks: parseJSON(req.body.inlineLinks),
       inlineLinks2: parseJSON(req.body.inlineLinks2),
+
+      // Course Info Card Fields
+      courseInfoCardTitle: req.body.courseInfoCardTitle || "COURSE DETAILS",
+      courseInfoFeeLabel: req.body.courseInfoFeeLabel || "COURSE FEE",
+      courseInfoFeeFromText: req.body.courseInfoFeeFromText || "starting from",
+      courseInfoBookBtnText: req.body.courseInfoBookBtnText || "BOOK NOW",
+      courseInfoUsdPrice: parseFloat(req.body.courseInfoUsdPrice) || 999,
+      courseInfoInrPrice: parseFloat(req.body.courseInfoInrPrice) || 82000,
+      courseInfoOriginalUsdPrice: parseFloat(req.body.courseInfoOriginalUsdPrice) || 1799,
+      courseInfoOriginalInrPrice: parseFloat(req.body.courseInfoOriginalInrPrice) || 148000,
+      courseInfoDetails: parseJSON(req.body.courseInfoDetails),
+
+      // Media Gallery Fields
+      contentBadgeText: req.body.contentBadgeText || "Welcome to AYM Yoga School",
+      contentTitleHighlight: req.body.contentTitleHighlight || "Rishikesh",
+      mediaMainImage,
+      mediaMainImageAlt: req.body.mediaMainImageAlt || "Yoga Teacher Training",
+      mediaMainVideoUrl: req.body.mediaMainVideoUrl || "",
+      mediaSmallImages: mediaSmallImagesArray,
+      trainingTags: trainingTags || [],
+      pillsItems: pillsItems || [],
+      accrEyebrowText: req.body.accrEyebrowText || "Certified & Recognised",
+      accrTaglineText: req.body.accrTaglineText || "Yoga Alliance USA & Ministry of AYUSH, Government of India",
     };
 
     const created = await Model.create(data);
@@ -144,13 +185,17 @@ exports.update = async (req, res) => {
       });
     }
 
-    const { heroImage, accredImages, courseImages, specialtyImages } =
+    const { heroImage, mediaMainImage, mediaSmallImages, accredImages, courseImages, specialtyImages } =
       extractImages(req.files || []);
 
     let accredBadges = parseJSON(req.body.accredBadges);
     let courseCards = parseJSON(req.body.courseCards);
     let specialtyCourses = parseJSON(req.body.specialtyCourses);
+    let mediaSmallImagesArray = parseJSON(req.body.mediaSmallImages) || [];
+    let trainingTags = parseJSON(req.body.trainingTags);
+    let pillsItems = parseJSON(req.body.pillsItems);
 
+    // map images
     accredBadges = accredBadges.map((item) => ({
       ...item,
       imgUrl: accredImages[item.id] || item.imgUrl || "",
@@ -164,6 +209,12 @@ exports.update = async (req, res) => {
     specialtyCourses = specialtyCourses.map((item) => ({
       ...item,
       imgUrl: specialtyImages[item.id] || item.imgUrl || "",
+    }));
+
+    // Map media small images
+    mediaSmallImagesArray = mediaSmallImagesArray.map((item, index) => ({
+      ...item,
+      imgUrl: mediaSmallImages[index] || item.imgUrl || "",
     }));
 
     const updateData = {
@@ -183,10 +234,36 @@ exports.update = async (req, res) => {
 
       inlineLinks: parseJSON(req.body.inlineLinks),
       inlineLinks2: parseJSON(req.body.inlineLinks2),
+
+      // Course Info Card Fields
+      courseInfoCardTitle: req.body.courseInfoCardTitle || existing.courseInfoCardTitle || "COURSE DETAILS",
+      courseInfoFeeLabel: req.body.courseInfoFeeLabel || existing.courseInfoFeeLabel || "COURSE FEE",
+      courseInfoFeeFromText: req.body.courseInfoFeeFromText || existing.courseInfoFeeFromText || "starting from",
+      courseInfoBookBtnText: req.body.courseInfoBookBtnText || existing.courseInfoBookBtnText || "BOOK NOW",
+      courseInfoUsdPrice: parseFloat(req.body.courseInfoUsdPrice) || existing.courseInfoUsdPrice || 999,
+      courseInfoInrPrice: parseFloat(req.body.courseInfoInrPrice) || existing.courseInfoInrPrice || 82000,
+      courseInfoOriginalUsdPrice: parseFloat(req.body.courseInfoOriginalUsdPrice) || existing.courseInfoOriginalUsdPrice || 1799,
+      courseInfoOriginalInrPrice: parseFloat(req.body.courseInfoOriginalInrPrice) || existing.courseInfoOriginalInrPrice || 148000,
+      courseInfoDetails: parseJSON(req.body.courseInfoDetails),
+
+      // Media Gallery Fields
+      contentBadgeText: req.body.contentBadgeText || existing.contentBadgeText || "Welcome to AYM Yoga School",
+      contentTitleHighlight: req.body.contentTitleHighlight || existing.contentTitleHighlight || "Rishikesh",
+      mediaMainImageAlt: req.body.mediaMainImageAlt || existing.mediaMainImageAlt || "Yoga Teacher Training",
+      mediaMainVideoUrl: req.body.mediaMainVideoUrl || existing.mediaMainVideoUrl || "",
+      mediaSmallImages: mediaSmallImagesArray,
+      trainingTags: trainingTags || [],
+      pillsItems: pillsItems || [],
+      accrEyebrowText: req.body.accrEyebrowText || existing.accrEyebrowText || "Certified & Recognised",
+      accrTaglineText: req.body.accrTaglineText || existing.accrTaglineText || "Yoga Alliance USA & Ministry of AYUSH, Government of India",
     };
 
     if (heroImage) {
       updateData.heroImage = heroImage;
+    }
+    
+    if (mediaMainImage) {
+      updateData.mediaMainImage = mediaMainImage;
     }
 
     const updated = await Model.findByIdAndUpdate(
