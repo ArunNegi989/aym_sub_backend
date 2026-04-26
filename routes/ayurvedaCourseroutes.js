@@ -9,6 +9,10 @@ const uploadFields = upload.fields([
   { name: "spicesStripImage", maxCount: 1 },
   { name: "sunsetImage", maxCount: 1 },
 
+  /* ✅ NEW: Panchakarma right image + training video */
+  { name: "panchakarmaRightImage", maxCount: 1 },
+  { name: "trainingVideoFile", maxCount: 1 },
+
   ...Array.from({ length: 20 }, (_, i) => ({
     name: `ayurvedaCourseImage_${i}`,
     maxCount: 1,

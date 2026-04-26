@@ -26,11 +26,24 @@ const parseData = (req, existing = {}) => {
     return item;
   });
 
-  const panchaKarmaCourses = safeParse(body.panchaKarmaCourses).map((item, i) => {
-    const file = req.files?.[`panchaKarmaCourseImage_${i}`];
-    if (file) item.image = "/uploads/" + file[0].filename;
-    return item;
-  });
+  const panchaKarmaCourses = safeParse(body.panchaKarmaCourses).map(
+    (item, i) => {
+      const file = req.files?.[`panchaKarmaCourseImage_${i}`];
+      if (file) item.image = "/uploads/" + file[0].filename;
+      return item;
+    }
+  );
+
+  /* ── Training video logic ──
+     Priority: newly uploaded file > URL field > keep existing
+  */
+  let trainingVideoFile = existing.trainingVideoFile || "";
+  let trainingVideoUrl = body.trainingVideoUrl || existing.trainingVideoUrl || "";
+
+  if (req.files?.trainingVideoFile) {
+    trainingVideoFile = "/uploads/" + req.files.trainingVideoFile[0].filename;
+    trainingVideoUrl = ""; // uploaded file takes priority, clear URL
+  }
 
   return {
     ...body,
@@ -39,6 +52,11 @@ const parseData = (req, existing = {}) => {
     introRightImage: getImg("introRightImage"),
     spicesStripImage: getImg("spicesStripImage"),
     sunsetImage: getImg("sunsetImage"),
+
+    /* ✅ NEW fields */
+    panchakarmaRightImage: getImg("panchakarmaRightImage"),
+    trainingVideoFile,
+    trainingVideoUrl,
 
     introParagraphs: body.introParagraphs || [],
     pkParagraphs: body.pkParagraphs || [],

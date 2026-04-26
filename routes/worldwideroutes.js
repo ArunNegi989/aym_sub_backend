@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../middleware/upload"); // your multer file
+const upload = require("../middleware/upload");
 
 const controller = require("../controllers/coursecontrollers/worldwidecontroller");
 
@@ -13,8 +13,9 @@ router.post(
     { name: "heroImage", maxCount: 1 },
     { name: "curriculumRightImage", maxCount: 1 },
     { name: "teacherTeamLeftImage", maxCount: 1 },
+    { name: "communitySliderImages", maxCount: 10 }, // up to 10 slider images
   ]),
-  controller.createContent,
+  controller.createContent
 );
 
 /* =========================
@@ -31,10 +32,10 @@ router.put(
     { name: "heroImage", maxCount: 1 },
     { name: "curriculumRightImage", maxCount: 1 },
     { name: "teacherTeamLeftImage", maxCount: 1 },
+    { name: "communitySliderImages", maxCount: 10 },
   ]),
-  controller.updateContent,
+  controller.updateContent
 );
-
 /* =========================
    DELETE
 ========================= */
