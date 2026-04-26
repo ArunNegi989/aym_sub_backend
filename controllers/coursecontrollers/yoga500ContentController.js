@@ -25,7 +25,7 @@ exports.createContent = async (req, res) => {
 
     const body = req.body;
 
-    // Parse introItems from form data - DECLARE ONCE
+    // Parse introItems from form data
     let introItems = parseJSON(body.introItems);
     
     // Handle intro media files
@@ -46,6 +46,16 @@ exports.createContent = async (req, res) => {
       });
     }
 
+    // Handle video file upload
+    let videoUrl = "";
+    if (req.files && req.files.videoFile && req.files.videoFile[0]) {
+      videoUrl = "/uploads/" + req.files.videoFile[0].filename;
+    } else if (body.existingVideoUrl) {
+      videoUrl = body.existingVideoUrl;
+    } else if (body.videoUrl) {
+      videoUrl = body.videoUrl;
+    }
+
     const data = {
       ...body,
       introItems: introItems,
@@ -63,6 +73,29 @@ exports.createContent = async (req, res) => {
       indianFees: parseJSON(body.indianFees),
       syllabusModules: parseJSON(body.syllabusModules),
       reviews: parseJSON(body.reviews),
+      // NEW FIELDS
+      standApartPills: parseJSON(body.standApartPills),
+      standApartStats: parseJSON(body.standApartStats),
+      imgBadgeText: body.imgBadgeText || "500 Hr Advanced TTC",
+      // VIDEO SECTION FIELDS
+      videoUrl: videoUrl,
+      videoBadgeText: body.videoBadgeText || "✦ Featured Video ✦",
+      videoTitle: body.videoTitle || "Experience the Journey of 500 Hour Yoga Teacher Training",
+      videoSubtitle: body.videoSubtitle || "Watch Our Students' Transformation",
+      // EVALUATION IMAGE ALT TEXT
+      evalImageAlt: body.evalImageAlt || "Evaluation process",
+      // COURSE INFO CARD FIELDS
+      courseInfoDetails: parseJSON(body.courseInfoDetails),
+      courseInfoCardTitle: body.courseInfoCardTitle || "COURSE DETAILS",
+      courseInfoFeeLabel: body.courseInfoFeeLabel || "COURSE FEE",
+      courseInfoFeeFromText: body.courseInfoFeeFromText || "starting from",
+      courseInfoBookBtnText: body.courseInfoBookBtnText || "BOOK NOW",
+      courseInfoOriginalPriceMultiplier: parseFloat(body.courseInfoOriginalPriceMultiplier) || 1.8,
+      // COURSE INFO CARD PRICING (Independent)
+      courseInfoUsdPrice: parseFloat(body.courseInfoUsdPrice) || 1649,
+      courseInfoInrPrice: parseFloat(body.courseInfoInrPrice) || 135000,
+      courseInfoOriginalUsdPrice: parseFloat(body.courseInfoOriginalUsdPrice) || 2950,
+      courseInfoOriginalInrPrice: parseFloat(body.courseInfoOriginalInrPrice) || 240000,
       heroImage: req.files?.heroImage
         ? "/uploads/" + req.files.heroImage[0].filename
         : "",
@@ -120,7 +153,7 @@ exports.updateContent = async (req, res) => {
     const finalAccom = [...keptAccom, ...newAccom];
     const finalFood = [...keptFood, ...newFood];
 
-    // Parse introItems - DECLARE ONCE
+    // Parse introItems
     let introItems = parseJSON(body.introItems);
     
     // Handle intro media files
@@ -141,6 +174,22 @@ exports.updateContent = async (req, res) => {
       });
     }
 
+    // Handle video file upload
+    let videoUrl = existing.videoUrl;
+    if (req.files && req.files.videoFile && req.files.videoFile[0]) {
+      videoUrl = "/uploads/" + req.files.videoFile[0].filename;
+    } else if (body.existingVideoUrl === "remove") {
+      videoUrl = "";
+    } else if (body.videoUrl && !req.files?.videoFile) {
+      videoUrl = body.videoUrl;
+    }
+
+    // Handle eval image upload
+    let evalImage = existing.evalImage;
+    if (req.files && req.files.evalImage && req.files.evalImage[0]) {
+      evalImage = "/uploads/" + req.files.evalImage[0].filename;
+    }
+
     const updated = {
       ...body,
       introItems: introItems,
@@ -158,15 +207,36 @@ exports.updateContent = async (req, res) => {
       indianFees: parseJSON(body.indianFees),
       syllabusModules: parseJSON(body.syllabusModules),
       reviews: parseJSON(body.reviews),
+      // NEW FIELDS
+      standApartPills: parseJSON(body.standApartPills),
+      standApartStats: parseJSON(body.standApartStats),
+      imgBadgeText: body.imgBadgeText || existing.imgBadgeText || "500 Hr Advanced TTC",
+      // VIDEO SECTION FIELDS
+      videoUrl: videoUrl,
+      videoBadgeText: body.videoBadgeText || existing.videoBadgeText || "✦ Featured Video ✦",
+      videoTitle: body.videoTitle || existing.videoTitle || "Experience the Journey of 500 Hour Yoga Teacher Training",
+      videoSubtitle: body.videoSubtitle || existing.videoSubtitle || "Watch Our Students' Transformation",
+      // EVALUATION IMAGE ALT TEXT
+      evalImageAlt: body.evalImageAlt || existing.evalImageAlt || "Evaluation process",
+      // COURSE INFO CARD FIELDS
+      courseInfoDetails: parseJSON(body.courseInfoDetails),
+      courseInfoCardTitle: body.courseInfoCardTitle || existing.courseInfoCardTitle || "COURSE DETAILS",
+      courseInfoFeeLabel: body.courseInfoFeeLabel || existing.courseInfoFeeLabel || "COURSE FEE",
+      courseInfoFeeFromText: body.courseInfoFeeFromText || existing.courseInfoFeeFromText || "starting from",
+      courseInfoBookBtnText: body.courseInfoBookBtnText || existing.courseInfoBookBtnText || "BOOK NOW",
+      courseInfoOriginalPriceMultiplier: parseFloat(body.courseInfoOriginalPriceMultiplier) || existing.courseInfoOriginalPriceMultiplier || 1.8,
+      // COURSE INFO CARD PRICING (Independent)
+      courseInfoUsdPrice: parseFloat(body.courseInfoUsdPrice) || existing.courseInfoUsdPrice || 1649,
+      courseInfoInrPrice: parseFloat(body.courseInfoInrPrice) || existing.courseInfoInrPrice || 135000,
+      courseInfoOriginalUsdPrice: parseFloat(body.courseInfoOriginalUsdPrice) || existing.courseInfoOriginalUsdPrice || 2950,
+      courseInfoOriginalInrPrice: parseFloat(body.courseInfoOriginalInrPrice) || existing.courseInfoOriginalInrPrice || 240000,
       heroImage: req.files?.heroImage
         ? "/uploads/" + req.files.heroImage[0].filename
         : existing.heroImage,
       shivaImage: req.files?.shivaImage
         ? "/uploads/" + req.files.shivaImage[0].filename
         : existing.shivaImage,
-      evalImage: req.files?.evalImage
-        ? "/uploads/" + req.files.evalImage[0].filename
-        : existing.evalImage,
+      evalImage: evalImage,
       accomImages: finalAccom,
       foodImages: finalFood,
     };
