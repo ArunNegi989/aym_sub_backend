@@ -9,6 +9,9 @@ const upload = require("../middleware/upload");
 const cpUpload = upload.fields([
   { name: "heroImage", maxCount: 1 },
   { name: "locationImage", maxCount: 1 },
+  { name: "featuresVideoFile", maxCount: 1 },
+  { name: "onlineVideoFile", maxCount: 1 },
+  { name: "onlineVideoPoster", maxCount: 1 },
   { name: "heroGridImage0", maxCount: 1 },
   { name: "heroGridImage1", maxCount: 1 },
   { name: "heroGridImage2", maxCount: 1 },
