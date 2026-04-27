@@ -8,22 +8,20 @@ const parseJSON = (val) => {
     return [];
   }
 };
+
 /* ========================= */
 const stripHtml = (html) => {
   if (!html) return "";
   return html.replace(/<[^>]+>/g, "");
 };
 
-const cleanArray = (arr = []) => {
-  return arr.map((item) => stripHtml(item));
-};
+const cleanArray = (arr = []) => arr.map((item) => stripHtml(item));
+
 /* ========================= */
 const mapFiles = (filesArray = []) => {
   const files = {};
   filesArray.forEach((file) => {
-    if (!files[file.fieldname]) {
-      files[file.fieldname] = [];
-    }
+    if (!files[file.fieldname]) files[file.fieldname] = [];
     files[file.fieldname].push(file);
   });
   return files;
@@ -31,8 +29,40 @@ const mapFiles = (filesArray = []) => {
 
 /* ========================= */
 const buildData = (req, existing = {}) => {
-  const body = req.body;
+  const body  = req.body;
   const files = mapFiles(req.files);
+
+  /* ── Reel Videos ──────────────────────────────────────────────
+     Admin sends reelVideos JSON array with shape:
+       { id, label, videoUrl, videoFile(existing path) }
+     Uploaded video files arrive as:  reelVideo_<id>
+
+     videoUrl can be:
+       - A YouTube embed URL  (rendered as <iframe>)
+       - A direct video URL   (mp4/webm/etc., rendered as <video>)
+       - An empty string
+
+     If a new file is uploaded for a reel, videoFile is set and
+     videoUrl is cleared (file takes priority on the frontend).
+  ────────────────────────────────────────────────────────────── */
+  const reelVideosRaw = parseJSON(body.reelVideos);
+  const reelVideos = reelVideosRaw.map((rv) => {
+    const fileKey = `reelVideo_${rv.id}`;
+    if (files[fileKey]) {
+      // New file uploaded → use file path, clear external url
+      return {
+        label:     rv.label || "",
+        videoUrl:  "",
+        videoFile: "/uploads/" + files[fileKey][0].filename,
+      };
+    }
+    // No new file → keep existing values (url or old file path)
+    return {
+      label:     rv.label     || "",
+      videoUrl:  rv.videoUrl  || "",
+      videoFile: rv.videoFile || "",
+    };
+  });
 
   return {
     ...body,
@@ -54,35 +84,38 @@ const buildData = (req, existing = {}) => {
       : existing.scheduleImage,
 
     introParagraphs: cleanArray(parseJSON(body.introParagraphs)),
-learnings: cleanArray(parseJSON(body.learnings)),
-mainFocus: cleanArray(parseJSON(body.mainFocus)),
-focusBodyText: stripHtml(body.focusBodyText),
-    corePrograms: parseJSON(body.corePrograms),
+    learnings:       cleanArray(parseJSON(body.learnings)),
+    mainFocus:       cleanArray(parseJSON(body.mainFocus)),
+    focusBodyText:   stripHtml(body.focusBodyText),
+
+    corePrograms:    parseJSON(body.corePrograms),
     specialPrograms: parseJSON(body.specialPrograms),
-    highlights: parseJSON(body.highlights),
-   
-    scheduleRows: parseJSON(body.scheduleRows),
-    applyFields: parseJSON(body.applyFields),
+    highlights:      parseJSON(body.highlights),
+    scheduleRows:    parseJSON(body.scheduleRows),
+    applyFields:     parseJSON(body.applyFields),
 
-    // BEACH IMAGES
-    beachImages: Object.keys(files)
-      .filter((k) => k.startsWith("beachImg_"))
-      .map((k) => ({
-        id: k.replace("beachImg_", ""),
-        imgUrl: "/uploads/" + files[k][0].filename,
-      })),
+    // BEACH IMAGES — merge existing with newly uploaded
+    beachImages: (() => {
+      const existingBeach = (existing.beachImages || []).reduce((acc, b) => {
+        acc[b.id] = b.imgUrl;
+        return acc;
+      }, {});
 
-    // CAMPUS IMAGES
-    campusImages: parseJSON(body.campusImages).map((item) => {
-      const key = `campusImg_${item.id}`;
-      if (files[key]) {
-        return {
-          ...item,
-          imgUrl: "/uploads/" + files[key][0].filename,
-        };
-      }
-      return item;
-    }),
+      const uploadedKeys = Object.keys(files).filter((k) =>
+        k.startsWith("beachImg_")
+      );
+      uploadedKeys.forEach((k) => {
+        const id = k.replace("beachImg_", "");
+        existingBeach[id] = "/uploads/" + files[k][0].filename;
+      });
+
+      return ["beach1", "beach2", "beach3"]
+        .filter((id) => existingBeach[id])
+        .map((id) => ({ id, imgUrl: existingBeach[id] }));
+    })(),
+
+    // ── Reel Videos ──
+    reelVideos,
   };
 };
 
@@ -90,14 +123,10 @@ focusBodyText: stripHtml(body.focusBodyText),
 exports.createPage = async (req, res) => {
   try {
     const exists = await GoaYoga.findOne();
-    if (exists) {
-      return res.status(400).json({ message: "Already exists" });
-    }
+    if (exists) return res.status(400).json({ message: "Already exists" });
 
-    const data = buildData(req);
-
+    const data    = buildData(req);
     const created = await GoaYoga.create(data);
-
     res.json({ success: true, data: created });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -116,14 +145,10 @@ exports.updatePage = async (req, res) => {
     const existing = await GoaYoga.findOne();
     if (!existing) return res.status(404).json({ message: "Not found" });
 
-    const data = buildData(req, existing);
-
-    const updated = await GoaYoga.findByIdAndUpdate(
-      existing._id,
-      data,
-      { new: true }
-    );
-
+    const data    = buildData(req, existing);
+    const updated = await GoaYoga.findByIdAndUpdate(existing._id, data, {
+      new: true,
+    });
     res.json({ success: true, data: updated });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -134,8 +159,6 @@ exports.updatePage = async (req, res) => {
 exports.deletePage = async (req, res) => {
   const existing = await GoaYoga.findOne();
   if (!existing) return res.status(404).json({ message: "Not found" });
-
   await GoaYoga.findByIdAndDelete(existing._id);
-
   res.json({ success: true, message: "Deleted" });
 };

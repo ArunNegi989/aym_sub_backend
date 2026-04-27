@@ -1,115 +1,114 @@
 const mongoose = require("mongoose");
 
 const goaYogaSchema = new mongoose.Schema(
-{
-  status: String,
+  {
+    status: String,
 
-  heroImage: String,
-  heroAlt: String,
+    heroImage: String,
+    heroAlt: String,
 
-  introSuperLabel: String,
-  introHeading: String,
-  introLocation: String,
-  introBestTime: String,
-  introParagraphs: [String],
+    introSuperLabel: String,
+    introHeading: String,
+    introLocation: String,
+    introBestTime: String,
+    introParagraphs: [String],
 
-  introBigImage: String,
-  introSmallImage: String,
+    introBigImage: String,
+    introSmallImage: String,
 
-  programsSuperLabel: String,
-  programsSectionTitle: String,
-  programsSubNote: String,
+    programsSuperLabel: String,
+    programsSectionTitle: String,
+    programsSubNote: String,
 
-  coreProgramsSectionHeading: String,
-  specialProgramsSectionHeading: String,
+    coreProgramsSectionHeading: String,
+    specialProgramsSectionHeading: String,
 
-  arambolDesc: String,
+    arambolDesc: String,
 
-  corePrograms: [
-    {
-      hrs: String,
-      tag: String,
-      subHeading: String,
-      desc: String,
-      linkText: String,
-      linkHref: String,
-    }
-  ],
+    corePrograms: [
+      {
+        hrs: String,
+        tag: String,
+        subHeading: String,
+        desc: String,
+        linkText: String,
+        linkHref: String,
+      },
+    ],
 
-  specialPrograms: [
-    { title: String, desc: String }
-  ],
+    specialPrograms: [{ title: String, desc: String }],
 
-  beachImages: [
-    { id: String, imgUrl: String }
-  ],
+    beachImages: [{ id: String, imgUrl: String }],
 
-  highlightsSuperLabel: String,
-  highlightsSectionTitle: String,
-  highlightsSubNote: String,
+    highlightsSuperLabel: String,
+    highlightsSectionTitle: String,
+    highlightsSubNote: String,
 
-  highlights: [
-    { num: String, title: String, body: String }
-  ],
+    highlights: [{ num: String, title: String, body: String }],
 
-  bestTimeHeading: String,
-  bestTimeText: String,
+    bestTimeHeading: String,
+    bestTimeText: String,
 
-  curriculumSuperLabel: String,
-  curriculumSectionTitle: String,
+    curriculumSuperLabel: String,
+    curriculumSectionTitle: String,
 
-  learnings: [String],
+    learnings: [String],
 
-  focusSectionTitle: String,
-  focusBodyText: String,
-  mainFocus: [String],
+    focusSectionTitle: String,
+    focusBodyText: String,
+    mainFocus: [String],
 
-  scheduleSuperLabel: String,
-  scheduleSectionTitle: String,
-  scheduleImage: String,
-  scheduleImageAlt: String,
+    scheduleSuperLabel: String,
+    scheduleSectionTitle: String,
+    scheduleImage: String,
+    scheduleImageAlt: String,
 
-  scheduleRows: [
-    { time: String, activity: String }
-  ],
+    scheduleRows: [{ time: String, activity: String }],
 
-  batchesSuperLabel: String,
-  batchesSectionTitle: String,
-  batchesNote: String,
-  batchesNoteEmail: String,
-  batchesAirportNote: String,
+    batchesSuperLabel: String,
+    batchesSectionTitle: String,
+    batchesNote: String,
+    batchesNoteEmail: String,
+    batchesAirportNote: String,
 
-  gallerySuperLabel: String,
-  gallerySectionTitle: String,
+    gallerySuperLabel: String,
+    gallerySectionTitle: String,
 
-  campusImages: [
-    { id: String, label: String, imgUrl: String }
-  ],
+    address1: String,
+    address2: String,
+    address3: String,
+    phone1: String,
+    phone2: String,
 
-  address1: String,
-  address2: String,
-  address3: String,
-  phone1: String,
-  phone2: String,
+    reachHeading: String,
+    reachViaAir: String,
 
-  reachHeading: String,
-  reachViaAir: String,
+    applyEmail: String,
+    applyDepositAmount: String,
+    refundPolicy: String,
+    rulesHref: String,
 
-  applyEmail: String,
-  applyDepositAmount: String,
-  refundPolicy: String,
-  rulesHref: String,
+    applyFields: [{ label: String }],
 
-  applyFields: [
-    { label: String }
-  ],
+    footerCtaTitle: String,
+    footerCtaSub: String,
+    footerCtaDatesHref: String,
+    footerCtaEmailHref: String,
 
-  footerCtaTitle: String,
-  footerCtaSub: String,
-  footerCtaDatesHref: String,
-  footerCtaEmailHref: String,
-},
-{ timestamps: true }
+    // ─── Reel Videos ───
+    // Each reel has a label, and EITHER:
+    //   videoUrl  → YouTube embed URL OR any direct video URL (mp4, etc.)
+    //   videoFile → uploaded file path e.g. /uploads/reel_xyz.mp4
+    // If videoFile is present it takes priority on the frontend.
+    reelVideos: [
+      {
+        label: String,
+        videoUrl: String,  // YouTube embed URL OR direct video URL
+        videoFile: String, // uploaded file path
+      },
+    ],
+  },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("GoaYogaPage", goaYogaSchema);
