@@ -58,6 +58,16 @@ const worldwideSchema = new mongoose.Schema(
     communityTitle: String,
     communitySubtext: String,
     communityDescription: String,
+    // Slider images for community section
+    communitySliderImages: [String], // array of uploaded image paths
+
+    // Sticky Section Nav
+    navItems: [
+      {
+        label: String,
+        id: String,
+      },
+    ],
 
     // Locations
     locationsTitle: String,
@@ -75,6 +85,9 @@ const worldwideSchema = new mongoose.Schema(
     footerTitle: String,
     footerSubtext: String,
     footerMetaText: String,
+    // Footer CTA buttons
+    footerApplyLink: String,
+    footerEmailAddress: String,
   },
   { timestamps: true }
 );

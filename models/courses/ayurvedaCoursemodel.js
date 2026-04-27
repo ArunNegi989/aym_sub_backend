@@ -38,6 +38,9 @@ const AyurvedaCourseSchema = new mongoose.Schema(
     pkParagraphs: [String],
     therapies: Array,
 
+    /* ✅ NEW: Panchakarma right-side image (was hardcoded Unsplash) */
+    panchakarmaRightImage: String,
+
     spicesStripTitle: String,
     spicesStripImage: String,
 
@@ -53,6 +56,10 @@ const AyurvedaCourseSchema = new mongoose.Schema(
     yogaMassageDates: String,
     trainingDesc: String,
     trainingParagraphs: [String],
+
+    /* ✅ NEW: Training video — either uploaded file path OR external URL */
+    trainingVideoUrl: String,   // YouTube / Vimeo embed URL
+    trainingVideoFile: String,  // uploaded video file path
 
     registrationAdvanceFee: String,
     registrationPaymentLink: String,

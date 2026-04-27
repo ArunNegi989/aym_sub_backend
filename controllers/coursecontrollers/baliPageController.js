@@ -11,12 +11,22 @@ const parseJSON = (val) => {
   }
 };
 
-
-
-const getArray = (body, key) => {
-  return Object.keys(body)
-    .filter((k) => k.startsWith(key))
-    .map((k) => body[k]);
+/* =========================
+   RESOLVE IMAGE
+   Priority: uploaded file > URL field > existing DB value
+========================= */
+const resolveImage = (req, fieldName, existing = {}) => {
+  // 1. File was uploaded
+  if (req.files?.[fieldName]?.[0]) {
+    return "/uploads/" + req.files[fieldName][0].filename;
+  }
+  // 2. URL was pasted (sent as `${fieldName}Url`)
+  const urlKey = `${fieldName}Url`;
+  if (req.body?.[urlKey] && req.body[urlKey].trim()) {
+    return req.body[urlKey].trim();
+  }
+  // 3. Keep existing DB value
+  return existing[fieldName] || "";
 };
 
 /* =========================
@@ -36,43 +46,20 @@ const parseData = (req, existing = {}) => {
     aymSpecial: parseJSON(body.aymSpecial),
     chakras: parseJSON(body.chakras),
 
-    /* ARRAY FIX */
+    /* Array fields */
     introParagraphs: parseJSON(body.introParagraphs),
-uniquePointsParagraphs: parseJSON(body.uniquePointsParagraphs),
+    uniquePointsParagraphs: parseJSON(body.uniquePointsParagraphs),
     aymSpecialParagraphs: parseJSON(body.aymSpecialParagraphs),
 
-    /* IMAGES */
-    heroImage: req.files?.heroImage?.[0]
-      ? "/uploads/" + req.files.heroImage[0].filename
-      : existing.heroImage,
-
-    groupImage: req.files?.groupImage?.[0]
-      ? "/uploads/" + req.files.groupImage[0].filename
-      : existing.groupImage,
-
-    templeImage: req.files?.templeImage?.[0]
-      ? "/uploads/" + req.files.templeImage[0].filename
-      : existing.templeImage,
-
-    riceImage: req.files?.riceImage?.[0]
-      ? "/uploads/" + req.files.riceImage[0].filename
-      : existing.riceImage,
-
-    practiceImage: req.files?.practiceImage?.[0]
-      ? "/uploads/" + req.files.practiceImage[0].filename
-      : existing.practiceImage,
-
-    teacherImage: req.files?.teacherImage?.[0]
-      ? "/uploads/" + req.files.teacherImage[0].filename
-      : existing.teacherImage,
-
-    gardenImage: req.files?.gardenImage?.[0]
-      ? "/uploads/" + req.files.gardenImage[0].filename
-      : existing.gardenImage,
-
-    ubudImage: req.files?.ubudImage?.[0]
-      ? "/uploads/" + req.files.ubudImage[0].filename
-      : existing.ubudImage,
+    /* IMAGES — file > URL > existing */
+    heroImage: resolveImage(req, "heroImage", existing),
+    groupImage: resolveImage(req, "groupImage", existing),
+    templeImage: resolveImage(req, "templeImage", existing),
+    riceImage: resolveImage(req, "riceImage", existing),
+    practiceImage: resolveImage(req, "practiceImage", existing),
+    teacherImage: resolveImage(req, "teacherImage", existing),
+    gardenImage: resolveImage(req, "gardenImage", existing),
+    ubudImage: resolveImage(req, "ubudImage", existing),
   };
 };
 
@@ -86,12 +73,11 @@ exports.createPage = async (req, res) => {
     if (existing) {
       return res.status(400).json({
         success: false,
-        message: "Only one Bali page allowed",
+        message: "Only one Bali page allowed. Use PUT to update.",
       });
     }
 
     const data = parseData(req);
-
     const page = new BaliPage(data);
     await page.save();
 
@@ -123,17 +109,15 @@ exports.updatePage = async (req, res) => {
     if (!existing) {
       return res.status(404).json({
         success: false,
-        message: "No page found",
+        message: "No Bali page found. Create one first.",
       });
     }
 
     const data = parseData(req, existing);
 
-    const updated = await BaliPage.findByIdAndUpdate(
-      existing._id,
-      data,
-      { new: true }
-    );
+    const updated = await BaliPage.findByIdAndUpdate(existing._id, data, {
+      new: true,
+    });
 
     res.json({ success: true, data: updated });
   } catch (err) {

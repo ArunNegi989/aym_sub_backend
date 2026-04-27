@@ -14,6 +14,22 @@ const parseData = (req, existing = {}) => {
     }
   };
 
+  // Handle community slider images:
+let communitySliderImages = existing.communitySliderImages || [];
+
+// ✅ keep old images sent from frontend
+if (body.existingSliderImages) {
+  communitySliderImages = JSON.parse(body.existingSliderImages);
+}
+
+// ✅ add new uploaded images
+if (req.files?.communitySliderImages) {
+  const newImages = req.files.communitySliderImages.map(
+    (f) => "/uploads/" + f.filename
+  );
+
+  communitySliderImages = [...communitySliderImages, ...newImages];
+}
   return {
     slug: body.slug,
     status: body.status,
@@ -77,6 +93,10 @@ const parseData = (req, existing = {}) => {
     communityTitle: body.communityTitle,
     communitySubtext: body.communitySubtext,
     communityDescription: body.communityDescription,
+    communitySliderImages,
+
+    // Nav items
+    navItems: parseJSON(body.navItems),
 
     // Locations
     locationsTitle: body.locationsTitle,
@@ -87,6 +107,8 @@ const parseData = (req, existing = {}) => {
     footerTitle: body.footerTitle,
     footerSubtext: body.footerSubtext,
     footerMetaText: body.footerMetaText,
+    footerApplyLink: body.footerApplyLink,
+    footerEmailAddress: body.footerEmailAddress,
   };
 };
 
