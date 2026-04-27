@@ -62,10 +62,15 @@ app.use(morgan("dev"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* =========================
+   UPLOAD ROUTES
+========================= */
+const uploadRoutes = require("./routes/uploadRoutes");
+app.use("/api/upload", uploadRoutes);
+
+/* =========================
    API ROUTES
 ========================= */
 app.use("/api", require("./routes"));
-
 /* =========================
    HEALTH CHECK
 ========================= */

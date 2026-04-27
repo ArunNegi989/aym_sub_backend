@@ -51,11 +51,6 @@ router.use("/our-mission", require("./ourMissionRoutes"));
 ========================= */
 router.use("/why-aym", require("./whyAYMRoutes"));
 
-/* =========================
-   TESTIMONIAL ROUTES
-========================= */
-router.use("/testimonials/videos", require("./Videotestimonialroutes"));
-router.use("/testimonials/text", require("./Textreviewroutes"));
 router.use("/courses-section", require("./courseSectionRoutes"));
 
 /* =========================
@@ -181,6 +176,15 @@ router.use("/worldwide/content", require("./worldwideroutes"));
    REGISTRATION ROUTES
 ========================= */
 router.use("/registration", require("./registrationRoutes"));
+
+/* =========================
+   TESTIMONIAL ROUTES
+========================= */
+router.use("/testimonials/videos", require("./Videotestimonialroutes"));
+router.use("/testimonials/text", require("./Textreviewroutes"));
+router.use("/student-reviews", require("./studentReviewRoutes"));
+router.use("/video-reviews", require("./studentvideoReviewRoutes"));
+
 
 /* ===========================
    API HEALTH CHECK
