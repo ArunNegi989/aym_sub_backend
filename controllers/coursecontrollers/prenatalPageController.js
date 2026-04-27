@@ -26,32 +26,99 @@ const buildData = (body, files) => {
     schedule: parseJSON(body.schedule),
     curriculum: parseJSON(body.curriculum),
     hoursSummary: parseJSON(body.hoursSummary),
+
+    // Features Dynamic Fields
+    featuresStats: parseJSON(body.featuresStats),
+    featuresPills: parseJSON(body.featuresPills),
+    
+    // Location Dynamic Fields
+    locationBadges: parseJSON(body.locationBadges),
+
+    // Online Highlights
+    onlineHighlights: parseJSON(body.onlineHighlights),
+
+    // Course Info Card Fields
+    courseInfoCardTitle: body.courseInfoCardTitle || "COURSE DETAILS",
+    courseInfoFeeLabel: body.courseInfoFeeLabel || "COURSE FEE",
+    courseInfoFeeFromText: body.courseInfoFeeFromText || "starting from",
+    courseInfoBookBtnText: body.courseInfoBookBtnText || "BOOK NOW",
+    courseInfoUsdPrice: parseFloat(body.courseInfoUsdPrice) || 399,
+    courseInfoInrPrice: parseFloat(body.courseInfoInrPrice) || 33000,
+    courseInfoOriginalUsdPrice: parseFloat(body.courseInfoOriginalUsdPrice) || 799,
+    courseInfoOriginalInrPrice: parseFloat(body.courseInfoOriginalInrPrice) || 66000,
+    courseInfoDetails: parseJSON(body.courseInfoDetails),
+    
+    // Features Video (Local file)
+    featuresVideoLabel: body.featuresVideoLabel || "Watch Our Prenatal Yoga Sessions",
+    
+    // Online Section Fields
+    onlineHeaderSubtitle: body.onlineHeaderSubtitle || "",
+    onlineHighlightsTitle: body.onlineHighlightsTitle || "What You Get Online",
+    onlineVideoLabel: body.onlineVideoLabel || "Course Preview",
+    onlineBonusIcon: body.onlineBonusIcon || "🎁",
+    onlineBonusTitle: body.onlineBonusTitle || "Bonus Included",
+    onlineBonusText: body.onlineBonusText || "Free access to prenatal yoga community & monthly workshops",
+    onlineCtaLabel: body.onlineCtaLabel || "Ready to begin your journey?",
+    onlineCtaSub: body.onlineCtaSub || "Join our next online batch · Flexible schedule · Globally certified",
+    onlineCtaBtnText: body.onlineCtaBtnText || "Enrol Now",
+    onlineCtaBtnUrl: body.onlineCtaBtnUrl || "#batch-section",
+    
+    // Location Map
+    locationMapEmbedUrl: body.locationMapEmbedUrl || "",
+    locationMapLabel: body.locationMapLabel || "📍 Tapovan, Rishikesh, Uttarakhand",
   };
 
-  /* IMAGES */
-  if (files?.heroImage) {
+  /* HERO IMAGE */
+  if (files?.heroImage && files.heroImage[0]) {
     data.heroImage = "/uploads/" + files.heroImage[0].filename;
   }
 
-  if (files?.locationImage) {
+  /* LOCATION IMAGE */
+  if (files?.locationImage && files.locationImage[0]) {
     data.locationImage = "/uploads/" + files.locationImage[0].filename;
   }
+  
+  /* FEATURES VIDEO FILE */
+  if (files?.featuresVideoFile && files.featuresVideoFile[0]) {
+    data.featuresVideoFile = "/uploads/" + files.featuresVideoFile[0].filename;
+  }
+  
+  /* ONLINE VIDEO FILE */
+  if (files?.onlineVideoFile && files.onlineVideoFile[0]) {
+    data.onlineVideoFile = "/uploads/" + files.onlineVideoFile[0].filename;
+  }
+  
+  /* ONLINE VIDEO POSTER */
+  if (files?.onlineVideoPoster && files.onlineVideoPoster[0]) {
+    data.onlineVideoPoster = "/uploads/" + files.onlineVideoPoster[0].filename;
+  }
 
-  /* HERO GRID */
+  /* HERO GRID IMAGES */
   const heroGridAlts = parseJSON(body.heroGridAlts);
-  const gridImages = [];
+  const heroGridImages = [];
 
   for (let i = 0; i < 3; i++) {
-    if (files[`heroGridImage${i}`]) {
-      gridImages.push({
-        url: "/uploads/" + files[`heroGridImage${i}`][0].filename,
+    const imageKey = `heroGridImage${i}`;
+    if (files && files[imageKey] && files[imageKey][0]) {
+      heroGridImages.push({
+        url: "/uploads/" + files[imageKey][0].filename,
         alt: heroGridAlts[i] || "",
       });
+    } else if (body.existingGridImages) {
+      const existingImages = parseJSON(body.existingGridImages);
+      if (existingImages[i] && existingImages[i].url) {
+        heroGridImages.push(existingImages[i]);
+      }
+    } else if (body.heroGridImages) {
+      const existingGrid = parseJSON(body.heroGridImages);
+      if (existingGrid[i] && existingGrid[i].url) {
+        heroGridImages.push(existingGrid[i]);
+      }
     }
   }
 
-  if (gridImages.length) {
-    data.heroGridImages = gridImages;
+  if (heroGridImages.length) {
+    data.heroGridImages = heroGridImages;
   }
 
   return data;
@@ -81,6 +148,7 @@ exports.createPage = async (req, res) => {
       data: created,
     });
   } catch (err) {
+    console.error("Create error:", err);
     res.status(500).json({
       success: false,
       message: err.message,
@@ -116,6 +184,7 @@ exports.updatePage = async (req, res) => {
       data: updated,
     });
   } catch (err) {
+    console.error("Update error:", err);
     res.status(500).json({
       success: false,
       message: err.message,
@@ -135,6 +204,7 @@ exports.getPage = async (req, res) => {
       data: page,
     });
   } catch (err) {
+    console.error("Get error:", err);
     res.status(500).json({
       success: false,
       message: err.message,
@@ -163,6 +233,7 @@ exports.deletePage = async (req, res) => {
       message: "Deleted successfully",
     });
   } catch (err) {
+    console.error("Delete error:", err);
     res.status(500).json({
       success: false,
       message: err.message,

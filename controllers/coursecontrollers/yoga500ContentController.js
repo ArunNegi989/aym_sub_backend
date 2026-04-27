@@ -73,38 +73,27 @@ exports.createContent = async (req, res) => {
       indianFees: parseJSON(body.indianFees),
       syllabusModules: parseJSON(body.syllabusModules),
       reviews: parseJSON(body.reviews),
-      // NEW FIELDS
       standApartPills: parseJSON(body.standApartPills),
       standApartStats: parseJSON(body.standApartStats),
       imgBadgeText: body.imgBadgeText || "500 Hr Advanced TTC",
-      // VIDEO SECTION FIELDS
       videoUrl: videoUrl,
       videoBadgeText: body.videoBadgeText || "✦ Featured Video ✦",
       videoTitle: body.videoTitle || "Experience the Journey of 500 Hour Yoga Teacher Training",
       videoSubtitle: body.videoSubtitle || "Watch Our Students' Transformation",
-      // EVALUATION IMAGE ALT TEXT
       evalImageAlt: body.evalImageAlt || "Evaluation process",
-      // COURSE INFO CARD FIELDS
       courseInfoDetails: parseJSON(body.courseInfoDetails),
       courseInfoCardTitle: body.courseInfoCardTitle || "COURSE DETAILS",
       courseInfoFeeLabel: body.courseInfoFeeLabel || "COURSE FEE",
       courseInfoFeeFromText: body.courseInfoFeeFromText || "starting from",
       courseInfoBookBtnText: body.courseInfoBookBtnText || "BOOK NOW",
       courseInfoOriginalPriceMultiplier: parseFloat(body.courseInfoOriginalPriceMultiplier) || 1.8,
-      // COURSE INFO CARD PRICING (Independent)
       courseInfoUsdPrice: parseFloat(body.courseInfoUsdPrice) || 1649,
       courseInfoInrPrice: parseFloat(body.courseInfoInrPrice) || 135000,
       courseInfoOriginalUsdPrice: parseFloat(body.courseInfoOriginalUsdPrice) || 2950,
       courseInfoOriginalInrPrice: parseFloat(body.courseInfoOriginalInrPrice) || 240000,
-      heroImage: req.files?.heroImage
-        ? "/uploads/" + req.files.heroImage[0].filename
-        : "",
-      shivaImage: req.files?.shivaImage
-        ? "/uploads/" + req.files.shivaImage[0].filename
-        : "",
-      evalImage: req.files?.evalImage
-        ? "/uploads/" + req.files.evalImage[0].filename
-        : "",
+      heroImage: req.files?.heroImage ? "/uploads/" + req.files.heroImage[0].filename : "",
+      shivaImage: req.files?.shivaImage ? "/uploads/" + req.files.shivaImage[0].filename : "",
+      evalImage: req.files?.evalImage ? "/uploads/" + req.files.evalImage[0].filename : "",
       accomImages: getArrayFiles(req.files, "accomImage"),
       foodImages: getArrayFiles(req.files, "foodImage"),
     };
@@ -112,6 +101,7 @@ exports.createContent = async (req, res) => {
     const newData = await Yoga500.create(data);
     res.json({ success: true, data: newData });
   } catch (err) {
+    console.error("Create error:", err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -124,6 +114,7 @@ exports.getContent = async (req, res) => {
     const data = await Yoga500.findOne();
     res.json({ success: true, data });
   } catch (err) {
+    console.error("Get error:", err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -138,20 +129,17 @@ exports.updateContent = async (req, res) => {
 
     const body = req.body;
 
-    // ── Newly uploaded files ──
+    // ── Get newly uploaded files ──
     const newAccom = getArrayFiles(req.files, "accomImage");
     const newFood = getArrayFiles(req.files, "foodImage");
 
-    // ── Paths the frontend chose to KEEP (not deleted by user) ──
-    const parsedAccom = parseJSON(body.existingAccomImages);
-    const parsedFood = parseJSON(body.existingFoodImages);
+    // ── Parse existing images sent from frontend ──
+    const existingAccom = parseJSON(body.existingAccomImages);
+    const existingFood = parseJSON(body.existingFoodImages);
 
-    const keptAccom = parsedAccom.length > 0 ? parsedAccom : existing.accomImages;
-    const keptFood = parsedFood.length > 0 ? parsedFood : existing.foodImages;
-
-    // ── Final = kept old + newly uploaded ──
-    const finalAccom = [...keptAccom, ...newAccom];
-    const finalFood = [...keptFood, ...newFood];
+    // ── Combine existing (kept) + newly uploaded ──
+    const finalAccom = [...existingAccom, ...newAccom];
+    const finalFood = [...existingFood, ...newFood];
 
     // Parse introItems
     let introItems = parseJSON(body.introItems);
@@ -190,6 +178,18 @@ exports.updateContent = async (req, res) => {
       evalImage = "/uploads/" + req.files.evalImage[0].filename;
     }
 
+    // Handle hero image upload
+    let heroImage = existing.heroImage;
+    if (req.files && req.files.heroImage && req.files.heroImage[0]) {
+      heroImage = "/uploads/" + req.files.heroImage[0].filename;
+    }
+
+    // Handle shiva image upload
+    let shivaImage = existing.shivaImage;
+    if (req.files && req.files.shivaImage && req.files.shivaImage[0]) {
+      shivaImage = "/uploads/" + req.files.shivaImage[0].filename;
+    }
+
     const updated = {
       ...body,
       introItems: introItems,
@@ -207,35 +207,26 @@ exports.updateContent = async (req, res) => {
       indianFees: parseJSON(body.indianFees),
       syllabusModules: parseJSON(body.syllabusModules),
       reviews: parseJSON(body.reviews),
-      // NEW FIELDS
       standApartPills: parseJSON(body.standApartPills),
       standApartStats: parseJSON(body.standApartStats),
       imgBadgeText: body.imgBadgeText || existing.imgBadgeText || "500 Hr Advanced TTC",
-      // VIDEO SECTION FIELDS
       videoUrl: videoUrl,
       videoBadgeText: body.videoBadgeText || existing.videoBadgeText || "✦ Featured Video ✦",
       videoTitle: body.videoTitle || existing.videoTitle || "Experience the Journey of 500 Hour Yoga Teacher Training",
       videoSubtitle: body.videoSubtitle || existing.videoSubtitle || "Watch Our Students' Transformation",
-      // EVALUATION IMAGE ALT TEXT
       evalImageAlt: body.evalImageAlt || existing.evalImageAlt || "Evaluation process",
-      // COURSE INFO CARD FIELDS
       courseInfoDetails: parseJSON(body.courseInfoDetails),
       courseInfoCardTitle: body.courseInfoCardTitle || existing.courseInfoCardTitle || "COURSE DETAILS",
       courseInfoFeeLabel: body.courseInfoFeeLabel || existing.courseInfoFeeLabel || "COURSE FEE",
       courseInfoFeeFromText: body.courseInfoFeeFromText || existing.courseInfoFeeFromText || "starting from",
       courseInfoBookBtnText: body.courseInfoBookBtnText || existing.courseInfoBookBtnText || "BOOK NOW",
       courseInfoOriginalPriceMultiplier: parseFloat(body.courseInfoOriginalPriceMultiplier) || existing.courseInfoOriginalPriceMultiplier || 1.8,
-      // COURSE INFO CARD PRICING (Independent)
       courseInfoUsdPrice: parseFloat(body.courseInfoUsdPrice) || existing.courseInfoUsdPrice || 1649,
       courseInfoInrPrice: parseFloat(body.courseInfoInrPrice) || existing.courseInfoInrPrice || 135000,
       courseInfoOriginalUsdPrice: parseFloat(body.courseInfoOriginalUsdPrice) || existing.courseInfoOriginalUsdPrice || 2950,
       courseInfoOriginalInrPrice: parseFloat(body.courseInfoOriginalInrPrice) || existing.courseInfoOriginalInrPrice || 240000,
-      heroImage: req.files?.heroImage
-        ? "/uploads/" + req.files.heroImage[0].filename
-        : existing.heroImage,
-      shivaImage: req.files?.shivaImage
-        ? "/uploads/" + req.files.shivaImage[0].filename
-        : existing.shivaImage,
+      heroImage: heroImage,
+      shivaImage: shivaImage,
       evalImage: evalImage,
       accomImages: finalAccom,
       foodImages: finalFood,
@@ -247,6 +238,7 @@ exports.updateContent = async (req, res) => {
 
     res.json({ success: true, data });
   } catch (err) {
+    console.error("Update error:", err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -259,6 +251,7 @@ exports.deleteContent = async (req, res) => {
     await Yoga500.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: "Deleted" });
   } catch (err) {
+    console.error("Delete error:", err);
     res.status(500).json({ message: err.message });
   }
 };
