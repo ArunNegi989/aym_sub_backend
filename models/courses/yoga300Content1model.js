@@ -1,3 +1,5 @@
+// backend/models/courses/yoga300Content1model.js
+
 const mongoose = require("mongoose");
 
 const moduleSchema = new mongoose.Schema({
@@ -14,6 +16,12 @@ const overviewSchema = new mongoose.Schema({
   label: String,
   value: String,
   multiline: Boolean,
+});
+
+// ADD THIS NEW SCHEMA
+const thumbnailSchema = new mongoose.Schema({
+  src: String,
+  alt: String,
 });
 
 const yoga300Content1Schema = new mongoose.Schema(
@@ -45,11 +53,13 @@ const yoga300Content1Schema = new mongoose.Schema(
     syllabusIntro: String,
 
     modules: [moduleSchema],
+
+    // ===== ADD THESE 3 NEW FIELDS =====
+    rightSideImage: { type: String, default: "" },
+    rightSideImageAlt: { type: String, default: "" },
+    bottomThumbnails: [thumbnailSchema],
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model(
-  "Yoga300Content1",
-  yoga300Content1Schema
-);
+module.exports = mongoose.model("Yoga300Content1", yoga300Content1Schema);

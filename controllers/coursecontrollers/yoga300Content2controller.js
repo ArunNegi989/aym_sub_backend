@@ -1,3 +1,4 @@
+// backend/controllers/coursecontrollers/yoga300Content2controller.js
 const Model = require("../../models/courses/yoga300Content2model");
 
 /* =========================
@@ -16,12 +17,20 @@ const parseData = (req) => {
   return {
     ...body,
 
+    // Evolution fields - WITH NEW DYNAMIC IMAGE FIELDS
+    evolutionH2: body.evolutionH2 || "",
+    evolutionRightImageAlt: body.evolutionRightImageAlt || "",
+    evolutionBadgeText: body.evolutionBadgeText || "Yoga Alliance",
+    evolutionBadgeSubtext: body.evolutionBadgeSubtext || "RYT 500 Certified",
+
+    // Paragraph arrays
     evolutionParas: JSON.parse(body.evolutionParas || "[]"),
     eligibilityParas: JSON.parse(body.eligibilityParas || "[]"),
     evaluationParas: JSON.parse(body.evaluationParas || "[]"),
     ethicsParas: JSON.parse(body.ethicsParas || "[]"),
     misconParas: JSON.parse(body.misconParas || "[]"),
 
+    // String arrays
     careerItems: getArray("careerItems"),
     feeCard1Items: getArray("feeCard1Items"),
     feeCard2Items: getArray("feeCard2Items"),
@@ -31,6 +40,7 @@ const parseData = (req) => {
     ethicsRules: getArray("ethicsRules"),
     misconItems: getArray("misconItems"),
 
+    // Complex arrays
     faqItems: JSON.parse(body.faqItems || "[]"),
     scheduleItems: JSON.parse(body.scheduleItems || "[]"),
     reviews: JSON.parse(body.reviews || "[]"),
@@ -66,6 +76,9 @@ exports.create = async (req, res) => {
 
     const data = parseData(req);
     const files = req.files || [];
+
+    // Evolution Right Side Image (NEW)
+    data.evolutionRightImage = getSingleFile(files, "evolutionRightImage") || "";
 
     // Carousel images
     data.accomImages = getFiles(files, "accomImages");
@@ -110,6 +123,16 @@ exports.update = async (req, res) => {
     const data = parseData(req);
     const files = req.files || [];
     const body = req.body;
+
+    // Evolution Right Side Image (NEW)
+    const evolutionRightImg = getSingleFile(files, "evolutionRightImage");
+    if (evolutionRightImg) {
+      data.evolutionRightImage = evolutionRightImg;
+    } else if (body.evolutionRightImageKeep === "true") {
+      data.evolutionRightImage = existing.evolutionRightImage;
+    } else {
+      data.evolutionRightImage = "";
+    }
 
     // Carousel images: kept existing + newly uploaded
     const buildCarousel = (newField, keepField) => {

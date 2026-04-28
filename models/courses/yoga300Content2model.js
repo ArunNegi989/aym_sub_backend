@@ -1,3 +1,4 @@
+// backend/models/courses/yoga300Content2model.js
 const mongoose = require("mongoose");
 
 const yoga300Content2Schema = new mongoose.Schema(
@@ -5,9 +6,13 @@ const yoga300Content2Schema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
 
-    // Evolution
+    // Evolution Section - WITH DYNAMIC RIGHT IMAGE
     evolutionH2: String,
     evolutionParas: [String],
+    evolutionRightImage: { type: String, default: "" },
+    evolutionRightImageAlt: { type: String, default: "" },
+    evolutionBadgeText: { type: String, default: "Yoga Alliance" },
+    evolutionBadgeSubtext: { type: String, default: "RYT 500 Certified" },
 
     // Mark Distribution
     markDistH3: String,
@@ -102,15 +107,15 @@ const yoga300Content2Schema = new mongoose.Schema(
     ],
 
     // YouTube
-youtubeVideos: [
-  {
-    id: String, // 🔥 ADD THIS
-    title: String,
-    type: { type: String, enum: ["url", "file"] },
-    videoId: String,
-    videoFile: String,
-  },
-],
+    youtubeVideos: [
+      {
+        id: String,
+        title: String,
+        type: { type: String, enum: ["url", "file"] },
+        videoId: String,
+        videoFile: String,
+      },
+    ],
   },
   { timestamps: true }
 );
