@@ -30,6 +30,8 @@ const QuoteCardSchema = new mongoose.Schema({
 const LocationSchema = new mongoose.Schema({
   name: String,
   desc: String,
+  image: String,
+  imageAlt: String,
 });
 
 const YogaTTCIndiaSchema = new mongoose.Schema(
@@ -77,6 +79,42 @@ const YogaTTCIndiaSchema = new mongoose.Schema(
     whyAYMTitle: String,
     arrivalTitle: String,
     feeTitle: String,
+
+    // ===== YOGA HOLIDAYS FIELDS =====
+    mainTitle: { type: String, default: "Yoga Holidays in India / Yoga Vacations in India, Rishikesh at AYM Yoga Holiday Retreats" },
+    mediaImage: String,
+    mediaImageAlt: { type: String, default: "Stunning View of Rishikesh - AYM Yoga Center" },
+    mediaImageCaption: { type: String, default: "Stunning View of Rishikesh — AYM Yoga Center" },
+    videoUrl: { type: String, default: "" },
+    videoPlaceholderText: { type: String, default: "Watch: Life at AYM Rishikesh" },
+    videoEnabled: { type: Boolean, default: false },
+    ayurvedaCalloutText: { type: String, default: "Many things can be combined with Yoga Holidays in Rishikesh, such as meditation and Ayurveda. Yoga and Ayurveda Spa will enhance your well-being — stimulating your mind and transforming your body. Meditation will calm your mind and body, reducing anxiety and tension. Practising Yoga with Ayurveda will restore your inner vitality and give you a healthy mind, body and soul." },
+    ayurvedaLinkText: { type: String, default: "Yoga with Ayurveda" },
+    ayurvedaLinkUrl: { type: String, default: "#" },
+    benefitsHeading: { type: String, default: "The benefits of our Yoga Holiday in Rishikesh :" },
+    benefitsList: [String],
+    ctaText: { type: String, default: "For more detail about yoga holiday packages / vacations in Rishikesh, India." },
+    ctaButtonText: { type: String, default: "Click Here to See Yoga Holidays Packages" },
+    ctaButtonUrl: { type: String, default: "#" },
+
+    // ===== WHO WE ARE VIDEO FIELDS =====
+    whoWeAreVideo: { type: String, default: "" },
+    whoWeAreVideoEnabled: { type: Boolean, default: false },
+    whoWeAreVideoPoster: { type: String, default: "" },
+
+    // ===== RISHIKESH & GOA SECTION IMAGES =====
+    rishikeshImage: { type: String, default: "" },
+    rishikeshImageAlt: { type: String, default: "Yoga Teacher Training in Rishikesh" },
+    rishikeshImageBadge: { type: String, default: "Rishikesh, India" },
+    
+    goaImage: { type: String, default: "" },
+    goaImageAlt: { type: String, default: "Yoga Teacher Training in Goa" },
+    goaImageBadge: { type: String, default: "Goa, India" },
+
+    // ===== WHY AYM SECTION IMAGE =====
+    whyAYMImage: { type: String, default: "" },
+    whyAYMImageAlt: { type: String, default: "Why AYM Yoga School" },
+    whyAYMImageBadge: { type: String, default: "Excellence in Yoga" },
   },
   { timestamps: true }
 );
