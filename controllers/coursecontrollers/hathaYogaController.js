@@ -1,8 +1,5 @@
 const HathaYoga = require("../../models/courses/hathaYogaModel");
 
-/* =========================
-   HELPER
-========================= */
 const parseJSON = (val) => {
   try {
     return val ? JSON.parse(val) : [];
@@ -15,64 +12,50 @@ const getFilePath = (file) => {
   return file ? "/uploads/" + file.filename : "";
 };
 
-/* =========================
-   CREATE / UPDATE (SINGLE)
-========================= */
 exports.saveHathaYoga = async (req, res) => {
   try {
     let existing = await HathaYoga.findOne();
 
-    // parse arrays
     const data = {
+      /* ── spread all plain string fields from body ── */
       ...req.body,
-      introParagraphs: parseJSON(req.body.introParagraphs),
-      whatParagraphs: parseJSON(req.body.whatParagraphs),
-      ashramParagraphs: parseJSON(req.body.ashramParagraphs),
+
+      /* ── existing arrays ── */
+      introParagraphs:     parseJSON(req.body.introParagraphs),
+      whatParagraphs:      parseJSON(req.body.whatParagraphs),
+      ashramParagraphs:    parseJSON(req.body.ashramParagraphs),
       programmeParagraphs: parseJSON(req.body.programmeParagraphs),
-      accreditations: parseJSON(req.body.accreditations),
-      benefitsList: parseJSON(req.body.benefitsList),
-      courseDetailsList: parseJSON(req.body.courseDetailsList),
-      certCards: parseJSON(req.body.certCards),
+      certParagraphs:      parseJSON(req.body.certParagraphs),
+      accreditations:      parseJSON(req.body.accreditations),
+      benefitsList:        parseJSON(req.body.benefitsList),
+      courseDetailsList:   parseJSON(req.body.courseDetailsList),
+      certCards:           parseJSON(req.body.certCards),
+
+      /* ── NEW: what-section feature cards ── */
+      whatCards: parseJSON(req.body.whatCards),
     };
 
-    /* =========================
-       FILES
-    ========================= */
-    if (req.files?.heroImage) {
+    /* ── image fields ── */
+    if (req.files?.heroImage)
       data.heroImage = getFilePath(req.files.heroImage[0]);
-    }
-
-    if (req.files?.introSideImage) {
+    if (req.files?.introSideImage)
       data.introSideImage = getFilePath(req.files.introSideImage[0]);
-    }
-
-    if (req.files?.benefitsSideImage) {
+    if (req.files?.benefitsSideImage)
       data.benefitsSideImage = getFilePath(req.files.benefitsSideImage[0]);
-    }
-
-    if (req.files?.ashramImage) {
+    if (req.files?.ashramImage)
       data.ashramImage = getFilePath(req.files.ashramImage[0]);
-    }
 
-    /* =========================
-       CERT CARD IMAGES
-    ========================= */
+    /* ── cert-card images ── */
     if (data.certCards.length) {
       data.certCards = data.certCards.map((card, i) => {
         const fileKey = `certCardImage_${i}`;
-        if (req.files[fileKey]) {
-          return {
-            ...card,
-            image: getFilePath(req.files[fileKey][0]),
-          };
+        if (req.files && req.files[fileKey]) {
+          return { ...card, image: getFilePath(req.files[fileKey][0]) };
         }
         return card;
       });
     }
 
-    /* =========================
-       SINGLE SYSTEM
-    ========================= */
     let result;
     if (existing) {
       result = await HathaYoga.findByIdAndUpdate(existing._id, data, {
@@ -92,33 +75,19 @@ exports.saveHathaYoga = async (req, res) => {
   }
 };
 
-/* =========================
-   GET SINGLE
-========================= */
 exports.getHathaYoga = async (req, res) => {
   try {
     const data = await HathaYoga.findOne();
-
-    res.json({
-      success: true,
-      data,
-    });
+    res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/* =========================
-   DELETE
-========================= */
 exports.deleteHathaYoga = async (req, res) => {
   try {
     await HathaYoga.deleteMany();
-
-    res.json({
-      success: true,
-      message: "Deleted successfully",
-    });
+    res.json({ success: true, message: "Deleted successfully" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
