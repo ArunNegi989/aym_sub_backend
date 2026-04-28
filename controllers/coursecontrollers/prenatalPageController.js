@@ -48,13 +48,19 @@ const buildData = (body, files) => {
     courseInfoOriginalInrPrice: parseFloat(body.courseInfoOriginalInrPrice) || 66000,
     courseInfoDetails: parseJSON(body.courseInfoDetails),
     
-    // Features Video (Local file)
+    // Features Video
+    featuresVideoType: body.featuresVideoType || "none",
+    featuresVideoUrl: body.featuresVideoUrl || "",
     featuresVideoLabel: body.featuresVideoLabel || "Watch Our Prenatal Yoga Sessions",
+    
+    // Online Section Video Fields
+    onlineVideoType: body.onlineVideoType || "none",
+    onlineVideoUrl: body.onlineVideoUrl || "",
+    onlineVideoLabel: body.onlineVideoLabel || "Course Preview",
     
     // Online Section Fields
     onlineHeaderSubtitle: body.onlineHeaderSubtitle || "",
     onlineHighlightsTitle: body.onlineHighlightsTitle || "What You Get Online",
-    onlineVideoLabel: body.onlineVideoLabel || "Course Preview",
     onlineBonusIcon: body.onlineBonusIcon || "🎁",
     onlineBonusTitle: body.onlineBonusTitle || "Bonus Included",
     onlineBonusText: body.onlineBonusText || "Free access to prenatal yoga community & monthly workshops",
@@ -78,14 +84,18 @@ const buildData = (body, files) => {
     data.locationImage = "/uploads/" + files.locationImage[0].filename;
   }
   
-  /* FEATURES VIDEO FILE */
-  if (files?.featuresVideoFile && files.featuresVideoFile[0]) {
+  /* FEATURES VIDEO FILE - only save if type is 'local' */
+  if (data.featuresVideoType === "local" && files?.featuresVideoFile && files.featuresVideoFile[0]) {
     data.featuresVideoFile = "/uploads/" + files.featuresVideoFile[0].filename;
+  } else if (data.featuresVideoType !== "local") {
+    data.featuresVideoFile = "";
   }
   
-  /* ONLINE VIDEO FILE */
-  if (files?.onlineVideoFile && files.onlineVideoFile[0]) {
+  /* ONLINE VIDEO FILE - only save if type is 'local' */
+  if (data.onlineVideoType === "local" && files?.onlineVideoFile && files.onlineVideoFile[0]) {
     data.onlineVideoFile = "/uploads/" + files.onlineVideoFile[0].filename;
+  } else if (data.onlineVideoType !== "local") {
+    data.onlineVideoFile = "";
   }
   
   /* ONLINE VIDEO POSTER */
