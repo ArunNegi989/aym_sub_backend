@@ -71,15 +71,38 @@ const yoga300Content2Schema = new mongoose.Schema(
     // Learning
     learningH2: String,
     learningItems: [String],
+    
+    // ===== NEW: Learning Outcomes Mosaic Images (3 images) =====
+    learningImage1: { type: String, default: "" },
+    learningImage1Alt: { type: String, default: "" },
+    learningImage1Label: { type: String, default: "" },
+    learningImage2: { type: String, default: "" },
+    learningImage2Alt: { type: String, default: "" },
+    learningImage2Label: { type: String, default: "" },
+    learningImage3: { type: String, default: "" },
+    learningImage3Alt: { type: String, default: "" },
+    learningImage3Label: { type: String, default: "" },
 
     // Eligibility
     eligibilityH2: String,
     eligibilityTag: String,
     eligibilityParas: [String],
+    
+    // ===== NEW: Eligibility Section Image =====
+    eligibilityImage: { type: String, default: "" },
+    eligibilityImageAlt: { type: String, default: "" },
 
     // Evaluation
     evaluationH2: String,
     evaluationParas: [String],
+    
+    // ===== NEW: Evaluation Section Images (2 images) =====
+    evaluationMainImage: { type: String, default: "" },
+    evaluationMainImageAlt: { type: String, default: "" },
+    evaluationSmallImage: { type: String, default: "" },
+    evaluationSmallImageAlt: { type: String, default: "" },
+    evaluationBadgeLine1: { type: String, default: "" },
+    evaluationBadgeLine2: { type: String, default: "" },
 
     // Ethics
     ethicsH2: String,
@@ -105,6 +128,17 @@ const yoga300Content2Schema = new mongoose.Schema(
         text: String,
       },
     ],
+
+    
+    // Yoga Ethics Section - Dynamic Images
+    ethicsImage1: { type: String, default: "" },
+    ethicsImage1Alt: { type: String, default: "" },
+    ethicsImage1Label: { type: String, default: "" },
+    ethicsImage2: { type: String, default: "" },
+    ethicsImage2Alt: { type: String, default: "" },
+    ethicsImage2Label: { type: String, default: "" },
+    diplomaBadgeLine1: { type: String, default: "" },
+    diplomaBadgeLine2: { type: String, default: "" },
 
     // YouTube
     youtubeVideos: [
