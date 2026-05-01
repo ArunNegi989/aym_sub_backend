@@ -11,8 +11,8 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,   // arunnegi989@gmail.com
-    pass: process.env.EMAIL_PASS,   // gudb yyof ksyv psus  (app password)
+    user: process.env.EMAIL_USER, // arunnegi989@gmail.com
+    pass: process.env.EMAIL_PASS, // gudb yyof ksyv psus  (app password)
   },
 });
 
@@ -25,8 +25,7 @@ function validateContact({ name, email, subject, message }) {
     errors.push("Name must be at least 3 characters.");
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     errors.push("Valid email is required.");
-  if (!subject || !subject.trim())
-    errors.push("Subject is required.");
+  if (!subject || !subject.trim()) errors.push("Subject is required.");
   if (!message || message.trim().length < 10)
     errors.push("Message must be at least 10 characters.");
   return errors;
@@ -256,7 +255,7 @@ router.post("/", async (req, res) => {
     /* 2. Send admin notification email */
     await transporter.sendMail({
       from: `"AYM Yoga School Contact" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_TO,                 // arunnegi989@gmail.com
+      to: process.env.EMAIL_TO, // arunnegi989@gmail.com
       replyTo: email,
       subject: `🧘 New Inquiry: ${subject} — ${name}`,
       html: adminEmailHTML({ name, email, phone, subject, course, message }),
