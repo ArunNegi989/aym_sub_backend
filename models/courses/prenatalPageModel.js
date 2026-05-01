@@ -58,8 +58,10 @@ const prenatalPageSchema = new mongoose.Schema(
     featuresPara2: String,
     featuresExtraParagraphs: [String],
     
-    // NEW - Features Video (Local file)
-    featuresVideoFile: String,  // Store video file path
+    // Features Video
+    featuresVideoFile: String,
+    featuresVideoUrl: String,
+    featuresVideoType: { type: String, enum: ["local", "url", "none"], default: "none" },
     featuresVideoLabel: { type: String, default: "Watch Our Prenatal Yoga Sessions" },
     featuresPills: { type: Array, default: [
       "Garbh Sanskar", "Pranayama", "Meditation", "Anatomy", "Teaching Practice", "Postnatal Care"
@@ -76,7 +78,6 @@ const prenatalPageSchema = new mongoose.Schema(
     locationImage: String,
     schedule: [scheduleSchema],
     
-    // NEW - Location Badges
     locationBadges: { type: Array, default: [
       "📍 Tapovan, Rishikesh",
       "🏔️ Himalayan Foothills",
@@ -125,14 +126,30 @@ const prenatalPageSchema = new mongoose.Schema(
       { label: "LANGUAGE", value: "English & Hindi", sub: "" },
       { label: "DATE", value: "Check batches below", sub: "" },
     ] },
+    
+    /* Online Section Fields */
     onlineVideoFile: String,
+    onlineVideoUrl: String,
+    onlineVideoType: { type: String, enum: ["local", "url", "none"], default: "none" },
     onlineVideoLabel: { type: String, default: "Course Preview" },
+    onlineVideoPoster: String,
     onlineBonusIcon: { type: String, default: "🎁" },
     onlineBonusTitle: { type: String, default: "Bonus Included" },
     onlineBonusText: { type: String, default: "Free access to prenatal yoga community & monthly workshops" },
     onlineCtaLabel: { type: String, default: "Ready to begin your journey?" },
     onlineCtaSub: { type: String, default: "Join our next online batch · Flexible schedule · Globally certified" },
     onlineCtaBtnText: { type: String, default: "Enrol Now" },
+    onlineCtaBtnUrl: { type: String, default: "#batch-section" },
+    onlineHeaderSubtitle: String,
+    onlineHighlightsTitle: String,
+    onlineHighlights: { type: Array, default: [
+      { icon: "🎥", text: "Recorded video lectures, lifetime access" },
+      { icon: "📄", text: "Downloadable course materials & PDFs" },
+      { icon: "🧘", text: "Live Q&A sessions with instructors" },
+      { icon: "🏆", text: "Internationally recognised certificate" },
+      { icon: "💬", text: "Private student community access" },
+      { icon: "🔄", text: "Flexible, self-paced learning schedule" },
+    ] },
   },
   { timestamps: true }
 );

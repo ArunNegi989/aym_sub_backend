@@ -1,9 +1,8 @@
+// backend/controllers/coursecontrollers/yoga300Content2controller.js
 const Model = require("../../models/courses/yoga300Content2model");
 
 /* =========================
    PARSER FUNCTION
-   Only called for full create/update (multipart/form-data).
-   NOT called for status-only PATCH.
 ========================= */
 const parseData = (req) => {
   const body = req.body;
@@ -16,21 +15,62 @@ const parseData = (req) => {
   return {
     ...body,
 
+    // Evolution fields
+    evolutionH2: body.evolutionH2 || "",
+    evolutionRightImageAlt: body.evolutionRightImageAlt || "",
+    evolutionBadgeText: body.evolutionBadgeText || "Yoga Alliance",
+    evolutionBadgeSubtext: body.evolutionBadgeSubtext || "RYT 500 Certified",
+
+    // Learning Images fields
+    learningImage1Alt: body.learningImage1Alt || "",
+    learningImage1Label: body.learningImage1Label || "",
+    learningImage2Alt: body.learningImage2Alt || "",
+    learningImage2Label: body.learningImage2Label || "",
+    learningImage3Alt: body.learningImage3Alt || "",
+    learningImage3Label: body.learningImage3Label || "",
+
+    // Eligibility Image fields
+    eligibilityImageAlt: body.eligibilityImageAlt || "",
+
+    // Evaluation Image fields
+    evaluationMainImageAlt: body.evaluationMainImageAlt || "",
+    evaluationSmallImageAlt: body.evaluationSmallImageAlt || "",
+    evaluationBadgeLine1: body.evaluationBadgeLine1 || "",
+    evaluationBadgeLine2: body.evaluationBadgeLine2 || "",
+
+    // Ethics Image fields
+    ethicsImage1Alt: body.ethicsImage1Alt || "",
+    ethicsImage1Label: body.ethicsImage1Label || "",
+    ethicsImage2Alt: body.ethicsImage2Alt || "",
+    ethicsImage2Label: body.ethicsImage2Label || "",
+    diplomaBadgeLine1: body.diplomaBadgeLine1 || "",
+    diplomaBadgeLine2: body.diplomaBadgeLine2 || "",
+
+    // Paragraph arrays
     evolutionParas: JSON.parse(body.evolutionParas || "[]"),
     eligibilityParas: JSON.parse(body.eligibilityParas || "[]"),
     evaluationParas: JSON.parse(body.evaluationParas || "[]"),
     ethicsParas: JSON.parse(body.ethicsParas || "[]"),
     misconParas: JSON.parse(body.misconParas || "[]"),
 
-    careerItems: getArray("careerItems"),
-    feeCard1Items: getArray("feeCard1Items"),
-    feeCard2Items: getArray("feeCard2Items"),
-    luxuryFeatures: getArray("luxuryFeatures"),
-    featuresList: getArray("featuresList"),
-    learningItems: getArray("learningItems"),
-    ethicsRules: getArray("ethicsRules"),
-    misconItems: getArray("misconItems"),
+    // String arrays
+    // careerItems: getArray("careerItems"),
+    careerItems: JSON.parse(body.careerItems || "[]"),
+    // feeCard1Items: getArray("feeCard1Items"),
+    feeCard1Items: JSON.parse(body.feeCard1Items || "[]"),
+    // feeCard2Items: getArray("feeCard2Items"),
+    feeCard2Items: JSON.parse(body.feeCard2Items || "[]"),
+    // luxuryFeatures: getArray("luxuryFeatures"),
+    luxuryFeatures: JSON.parse(body.luxuryFeatures || "[]"),
+    // featuresList: getArray("featuresList"),
+    featuresList: JSON.parse(body.featuresList || "[]"),
+    learningItems: JSON.parse(body.learningItems || "[]"),
+    // ethicsRules: getArray("ethicsRules"),
+    ethicsRules: JSON.parse(body.ethicsRules || "[]"),
+    // misconItems: getArray("misconItems"),
+    misconItems: JSON.parse(body.misconItems || "[]"),
 
+    // Complex arrays
     faqItems: JSON.parse(body.faqItems || "[]"),
     scheduleItems: JSON.parse(body.scheduleItems || "[]"),
     reviews: JSON.parse(body.reviews || "[]"),
@@ -51,6 +91,17 @@ const getSingleFile = (files, field) => {
   return file ? "/uploads/" + file.filename : null;
 };
 
+// Helper to handle image updates
+const handleImageUpdate = (files, body, existingImage, imageField, keepField) => {
+  const newImage = getSingleFile(files, imageField);
+  if (newImage) {
+    return newImage;
+  } else if (body[keepField] === "true") {
+    return existingImage;
+  }
+  return "";
+};
+
 /* =========================
    CREATE (ONLY ONE RECORD)
 ========================= */
@@ -66,6 +117,25 @@ exports.create = async (req, res) => {
 
     const data = parseData(req);
     const files = req.files || [];
+
+    // Evolution Right Side Image
+    data.evolutionRightImage = getSingleFile(files, "evolutionRightImage") || "";
+
+    // Learning Outcomes Mosaic Images
+    data.learningImage1 = getSingleFile(files, "learningImage1") || "";
+    data.learningImage2 = getSingleFile(files, "learningImage2") || "";
+    data.learningImage3 = getSingleFile(files, "learningImage3") || "";
+
+    // Eligibility Image
+    data.eligibilityImage = getSingleFile(files, "eligibilityImage") || "";
+
+    // Evaluation Images
+    data.evaluationMainImage = getSingleFile(files, "evaluationMainImage") || "";
+    data.evaluationSmallImage = getSingleFile(files, "evaluationSmallImage") || "";
+
+    // Ethics Images
+    data.ethicsImage1 = getSingleFile(files, "ethicsImage1") || "";
+    data.ethicsImage2 = getSingleFile(files, "ethicsImage2") || "";
 
     // Carousel images
     data.accomImages = getFiles(files, "accomImages");
@@ -110,6 +180,25 @@ exports.update = async (req, res) => {
     const data = parseData(req);
     const files = req.files || [];
     const body = req.body;
+
+    // Evolution Right Side Image
+    data.evolutionRightImage = handleImageUpdate(files, body, existing.evolutionRightImage, "evolutionRightImage", "evolutionRightImageKeep");
+
+    // Learning Outcomes Mosaic Images
+    data.learningImage1 = handleImageUpdate(files, body, existing.learningImage1, "learningImage1", "learningImage1Keep");
+    data.learningImage2 = handleImageUpdate(files, body, existing.learningImage2, "learningImage2", "learningImage2Keep");
+    data.learningImage3 = handleImageUpdate(files, body, existing.learningImage3, "learningImage3", "learningImage3Keep");
+
+    // Eligibility Image
+    data.eligibilityImage = handleImageUpdate(files, body, existing.eligibilityImage, "eligibilityImage", "eligibilityImageKeep");
+
+    // Evaluation Images
+    data.evaluationMainImage = handleImageUpdate(files, body, existing.evaluationMainImage, "evaluationMainImage", "evaluationMainImageKeep");
+    data.evaluationSmallImage = handleImageUpdate(files, body, existing.evaluationSmallImage, "evaluationSmallImage", "evaluationSmallImageKeep");
+
+    // Ethics Images
+    data.ethicsImage1 = handleImageUpdate(files, body, existing.ethicsImage1, "ethicsImage1", "ethicsImage1Keep");
+    data.ethicsImage2 = handleImageUpdate(files, body, existing.ethicsImage2, "ethicsImage2", "ethicsImage2Keep");
 
     // Carousel images: kept existing + newly uploaded
     const buildCarousel = (newField, keepField) => {
@@ -168,9 +257,6 @@ exports.update = async (req, res) => {
 
 /* =========================
    UPDATE STATUS ONLY
-   FIX: Dedicated endpoint so the list page
-   can toggle status without accidentally
-   wiping all arrays via parseData.
 ========================= */
 exports.updateStatus = async (req, res) => {
   try {

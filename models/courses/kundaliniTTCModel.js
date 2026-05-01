@@ -187,6 +187,9 @@ const kundaliniSchema = new mongoose.Schema(
       { color: "#c8890a", bg: "rgba(200,137,10,0.07)", border: "rgba(200,137,10,0.2)" }
     ] },
     
+
+    kundaliniIntroHeading: { type: String, default: "The Science of Kundalini Yoga" },
+    kundaliniIntroParagraph: { type: String, default: "<p>Kundalini Yoga is the ancient science of awakening the dormant energy within every human being. It combines breath, movement, meditation, and mantra to help you connect with your highest self and unlock your full potential.</p>" },
     // Section 9 - Refund Trust Strip
     refundTrustItems: { type: Array, default: [
       { icon: "📩", text: "All cancellations must be made via email" },
