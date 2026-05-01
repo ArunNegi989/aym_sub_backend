@@ -71,6 +71,9 @@ app.use("/api/upload", uploadRoutes);
    API ROUTES
 ========================= */
 app.use("/api", require("./routes"));
+
+const contactRoute = require("./routes/contact.route");
+app.use("/api/contact", contactRoute);
 /* =========================
    HEALTH CHECK
 ========================= */
