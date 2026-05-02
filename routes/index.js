@@ -91,17 +91,8 @@ router.use("/email", require("./emailRoutes"));
 /* =========================
    200HR SEATS ROUTES
 ========================= */
+router.use("/yoga-200hr/content", require("./yoga200Contentroutes"));
 router.use("/200hr-seats", require("./twoHundredBatchRoutes"));
-
-/* =========================
-   200HR CONTENT PART 1
-========================= */
-router.use("/yoga-200hr/content1", require("./yoga200Content1.routes"));
-
-/* =========================
-   🔥 200HR CONTENT PART 2 (ADD THIS)
-========================= */
-router.use("/yoga-200hr/content2", require("./yoga200Content2routes"));
 
 /* =========================
    300HR SEATS ROUTES
