@@ -13,20 +13,20 @@ const generateRefreshToken = (userId) => {
 };
 
 const sendTokenResponse = async (user, statusCode, res) => {
-  const accessToken = generateAccessToken(user._id);
+  const accessToken  = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 
   user.refreshToken = refreshToken;
   await user.save();
 
- const cookieOptions = {
-  httpOnly: true,
-  secure: false,      // since you're using HTTP
-  sameSite: "lax",    // 🔥 CHANGE FROM STRICT TO LAX
-  maxAge: 60 * 24 * 60 * 60 * 1000,
-};
-
-  res.cookie("refreshToken", refreshToken, cookieOptions);
+  // ✅ Cookie options — all fields explicit so clearCookie can match exactly
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false,      // set to true in production (HTTPS)
+    sameSite: "lax",
+    path: "/",          // ← required for clearCookie to work
+    maxAge: 60 * 24 * 60 * 60 * 1000, // 60 days
+  });
 
   const userObj = user.toObject();
   delete userObj.password;
