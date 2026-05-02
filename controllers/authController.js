@@ -48,6 +48,7 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
+// Refresh Token
 exports.refreshToken = async (req, res) => {
   try {
     const token = req.cookies.refreshToken;
@@ -66,9 +67,15 @@ exports.refreshToken = async (req, res) => {
 
     const accessToken = generateAccessToken(user._id);
 
+    // ✅ Return user object so frontend can restore session
     res.json({
       success: true,
       accessToken,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (error) {
     return res.status(403).json({ message: "Invalid refresh token" });
@@ -77,24 +84,26 @@ exports.refreshToken = async (req, res) => {
 
 // Logout
 exports.logoutUser = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  try {
+    const token = req.cookies.refreshToken;
 
-  if (token) {
-    const user = await User.findOne({ refreshToken: token });
-    if (user) {
-      user.refreshToken = null;
-      await user.save();
+    if (token) {
+      const user = await User.findOne({ refreshToken: token });
+      if (user) {
+        user.refreshToken = null;
+        await user.save();
+      }
     }
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    });
+
+    res.json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Logout failed" });
   }
-
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  });
-
-  res.json({
-    success: true,
-    message: "Logged out successfully",
-  });
 };
