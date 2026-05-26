@@ -1,7 +1,9 @@
 const Worldwide = require("../../models/courses/worldwidemodel");
+const fs = require("fs");
+const path = require("path");
 
 /* =========================
-   PARSE FUNCTION
+   PARSE FUNCTION - UPDATED
 ========================= */
 const parseData = (req, existing = {}) => {
   const body = req.body;
@@ -14,22 +16,41 @@ const parseData = (req, existing = {}) => {
     }
   };
 
-  // Handle community slider images:
-let communitySliderImages = existing.communitySliderImages || [];
-
-// ✅ keep old images sent from frontend
-if (body.existingSliderImages) {
-  communitySliderImages = JSON.parse(body.existingSliderImages);
-}
-
-// ✅ add new uploaded images
-if (req.files?.communitySliderImages) {
-  const newImages = req.files.communitySliderImages.map(
-    (f) => "/uploads/" + f.filename
-  );
-
-  communitySliderImages = [...communitySliderImages, ...newImages];
-}
+  // Handle community slider images with deletion support
+  let communitySliderImages = [];
+  
+  // Get existing images that should be kept
+  let existingImagesToKeep = [];
+  if (body.existingSliderImages) {
+    existingImagesToKeep = JSON.parse(body.existingSliderImages);
+    communitySliderImages = [...existingImagesToKeep];
+  } else if (existing.communitySliderImages) {
+    // If no existing images specified, keep all existing (fallback)
+    communitySliderImages = [...existing.communitySliderImages];
+  }
+  
+  // Handle deleted images - delete from filesystem
+  if (body.deletedSliderImages) {
+    const deletedImages = JSON.parse(body.deletedSliderImages);
+    deletedImages.forEach(imagePath => {
+      // Construct full file path
+      const fullPath = path.join(__dirname, "../..", imagePath);
+      // Delete file if exists
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+        console.log(`Deleted slider image: ${fullPath}`);
+      }
+    });
+  }
+  
+  // Add new uploaded images
+  if (req.files?.communitySliderImages) {
+    const newImages = req.files.communitySliderImages.map(
+      (f) => "/uploads/" + f.filename
+    );
+    communitySliderImages = [...communitySliderImages, ...newImages];
+  }
+  
   return {
     slug: body.slug,
     status: body.status,
@@ -178,6 +199,32 @@ exports.deleteContent = async (req, res) => {
     const existing = await Worldwide.findOne();
     if (!existing) {
       return res.status(404).json({ message: "No data found" });
+    }
+    
+    // Optional: Delete all associated image files before deleting the record
+    if (existing.communitySliderImages && existing.communitySliderImages.length) {
+      existing.communitySliderImages.forEach(imagePath => {
+        const fullPath = path.join(__dirname, "../..", imagePath);
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+      });
+    }
+    
+    // Also delete other images if needed
+    if (existing.heroImage) {
+      const heroPath = path.join(__dirname, "../..", existing.heroImage);
+      if (fs.existsSync(heroPath)) fs.unlinkSync(heroPath);
+    }
+    
+    if (existing.curriculumRightImage) {
+      const currPath = path.join(__dirname, "../..", existing.curriculumRightImage);
+      if (fs.existsSync(currPath)) fs.unlinkSync(currPath);
+    }
+    
+    if (existing.teacherTeamLeftImage) {
+      const teacherPath = path.join(__dirname, "../..", existing.teacherTeamLeftImage);
+      if (fs.existsSync(teacherPath)) fs.unlinkSync(teacherPath);
     }
 
     await Worldwide.findByIdAndDelete(existing._id);
