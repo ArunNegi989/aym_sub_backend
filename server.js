@@ -15,10 +15,22 @@ connectDB();
 
 app.set("trust proxy", 1);
 
-/* ========================= CORS — must be first ========================= */
+/* ========================= CORS ========================= */
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://172.20.10.3:3000", // ✅ hotspot IP
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:3000", // ✅ exact origin, NOT true/*
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -27,8 +39,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ========================= COOKIE PARSER — before routes ========================= */
-app.use(cookieParser()); // ✅ must be here before ANY route
+/* ========================= COOKIE PARSER ========================= */
+app.use(cookieParser());
 
 /* ========================= SECURITY ========================= */
 app.use(
@@ -43,17 +55,17 @@ app.use(morgan("dev"));
 /* ========================= STATIC FILES ========================= */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-/* ========================= ROUTES — all after middleware ========================= */
+/* ========================= ROUTES ========================= */
 const uploadRoutes = require("./routes/uploadRoutes");
 app.use("/api/upload", uploadRoutes);
 
 const courseStatsRoute = require("./routes/courseStatsRoutes");
-app.use("/api/course-stats", courseStatsRoute); // ✅ moved after cookieParser
+app.use("/api/course-stats", courseStatsRoute);
 
 const contactRoute = require("./routes/Contact.route");
 app.use("/api/contact", contactRoute);
 
-app.use("/api", require("./routes")); // ✅ this includes /api/auth/refresh
+app.use("/api", require("./routes"));
 
 /* ========================= HEALTH CHECK ========================= */
 app.get("/", (req, res) => {
