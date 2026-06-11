@@ -19,17 +19,13 @@ exports.registerUser = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role: "user", // ✅ default user, DB se manually admin karo
     });
 
-    res.status(201).json({
-      success: true,
-      message: "Account created successfully.",
-    });
+    await sendTokenResponse(user, 201, res);
   } catch (error) {
     next(error);
   }
@@ -42,18 +38,11 @@ exports.loginUser = async (req, res, next) => {
 
     const user = await User.findOne({ email });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    if (user && (await bcrypt.compare(password, user.password))) {
+      await sendTokenResponse(user, 200, res);
+    } else {
+      res.status(401).json({ message: "Invalid credentials" });
     }
-
-    // ✅ role check
-    if (user.role !== "admin") {
-      return res.status(403).json({
-        message: "Only Admin can access the Admin Dashboard.",
-      });
-    }
-
-    await sendTokenResponse(user, 200, res);
   } catch (error) {
     next(error);
   }
@@ -69,6 +58,7 @@ exports.refreshToken = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+
     const user = await User.findById(decoded.id);
 
     if (!user || user.refreshToken !== token) {
@@ -77,6 +67,7 @@ exports.refreshToken = async (req, res) => {
 
     const accessToken = generateAccessToken(user._id);
 
+    // ✅ Return user object so frontend can restore session
     res.json({
       success: true,
       accessToken,
@@ -84,7 +75,6 @@ exports.refreshToken = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
       },
     });
   } catch (error) {
@@ -107,8 +97,8 @@ exports.logoutUser = async (req, res) => {
 
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       path: "/",
     });
 
