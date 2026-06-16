@@ -117,3 +117,13 @@ exports.logoutUser = async (req, res) => {
     res.status(500).json({ message: "Logout failed" });
   }
 };
+
+// Check if any admin exists
+exports.checkAdmin = async (req, res, next) => {
+  try {
+    const adminExists = await User.exists({ role: "admin" });
+    res.json({ adminExists: !!adminExists });
+  } catch (error) {
+    next(error);
+  }
+};
