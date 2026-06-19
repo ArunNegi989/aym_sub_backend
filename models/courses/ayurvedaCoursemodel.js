@@ -8,7 +8,6 @@ const AyurvedaCourseSchema = new mongoose.Schema(
     pageTitleH1: String,
     heroImgAlt: String,
     heroImage: String,
-
     introSuperLabel: String,
     introTitle: String,
     introText1: String,
@@ -16,7 +15,6 @@ const AyurvedaCourseSchema = new mongoose.Schema(
     introList: String,
     introRightImage: String,
     introParagraphs: [String],
-
     spaWelcomeText: String,
     spaBoxText: String,
 

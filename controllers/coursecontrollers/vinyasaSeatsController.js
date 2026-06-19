@@ -58,7 +58,12 @@ exports.createBatch = async (req, res) => {
 ========================= */
 exports.getAllBatches = async (req, res) => {
   try {
-    const data = await VinyasaSeats.find().sort({ startDate: 1 });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const data = await VinyasaSeats.find({
+      endDate: { $gte: today }
+    }).sort({ startDate: 1 });
 
     res.json({
       success: true,

@@ -47,4 +47,5 @@ const prenatalSeatsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+prenatalSeatsSchema.index({ endDate: 1 }, { expireAfterSeconds: 0 });
 module.exports = mongoose.model("PrenatalSeats", prenatalSeatsSchema);

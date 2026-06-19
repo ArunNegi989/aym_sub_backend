@@ -10,17 +10,13 @@ const BestYogaSchoolSchema = new mongoose.Schema(
     accrSectionTitle: String,
     coursesSectionTitle: String,
     specialtySectionTitle: String,
-
     bodyParagraphs1: [String],
     bodyParagraphs2: [String],
-
     accredBadges: Array,
     courseCards: Array,
     specialtyCourses: Array,
-
     inlineLinks: Array,
     inlineLinks2: Array,
-
     // Course Info Card Fields
     courseInfoCardTitle: { type: String, default: "COURSE DETAILS" },
     courseInfoFeeLabel: { type: String, default: "COURSE FEE" },

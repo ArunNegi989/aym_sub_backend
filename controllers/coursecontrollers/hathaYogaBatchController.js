@@ -28,12 +28,17 @@ exports.createBatch = async (req, res) => {
 ========================= */
 exports.getAllBatches = async (req, res) => {
   try {
-    const batches = await HathaYogaBatch.find().sort({ startDate: 1 });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const data = await HathaYogaBatch.find({
+      endDate: { $gte: today }
+    }).sort({ startDate: 1 });
 
     res.json({
       success: true,
-      count: batches.length,
-      data: batches,
+      count: data.length,
+      data,
     });
   } catch (err) {
     res.status(500).json({

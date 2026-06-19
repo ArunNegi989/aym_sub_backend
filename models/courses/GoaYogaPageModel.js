@@ -3,26 +3,20 @@ const mongoose = require("mongoose");
 const goaYogaSchema = new mongoose.Schema(
   {
     status: String,
-
     heroImage: String,
     heroAlt: String,
-
     introSuperLabel: String,
     introHeading: String,
     introLocation: String,
     introBestTime: String,
     introParagraphs: [String],
-
     introBigImage: String,
     introSmallImage: String,
-
     programsSuperLabel: String,
     programsSectionTitle: String,
     programsSubNote: String,
-
     coreProgramsSectionHeading: String,
     specialProgramsSectionHeading: String,
-
     arambolDesc: String,
 
     corePrograms: [

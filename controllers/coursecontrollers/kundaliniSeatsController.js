@@ -54,7 +54,12 @@ exports.createBatch = async (req, res) => {
 ========================= */
 exports.getAll = async (req, res) => {
   try {
-    const data = await Model.find().sort({ startDate: 1 });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const data = await Model.find({
+      endDate: { $gte: today }
+    }).sort({ startDate: 1 });
 
     res.json({
       success: true,
@@ -67,7 +72,6 @@ exports.getAll = async (req, res) => {
     });
   }
 };
-
 /* =========================
    GET SINGLE
 ========================= */

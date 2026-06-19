@@ -53,6 +53,7 @@ const goaFiveHundredBatchSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+goaFiveHundredBatchSchema.index({ endDate: 1 }, { expireAfterSeconds: 0 });
 module.exports = mongoose.model(
   "GoaFiveHundredBatch",
   goaFiveHundredBatchSchema

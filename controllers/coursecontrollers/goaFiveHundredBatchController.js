@@ -25,7 +25,12 @@ exports.createBatch = async (req, res) => {
 ========================= */
 exports.getAllBatches = async (req, res) => {
   try {
-    const batches = await GoaFiveHundredBatch.find().sort({ startDate: 1 });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const batches = await GoaFiveHundredBatch.find({
+      endDate: { $gte: today }
+    }).sort({ startDate: 1 });
 
     res.json({
       success: true,

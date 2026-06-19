@@ -54,4 +54,5 @@ const kundaliniSeatsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+kundaliniSeatsSchema.index({ endDate: 1 }, { expireAfterSeconds: 0 });
 module.exports = mongoose.model("KundaliniSeats", kundaliniSeatsSchema);

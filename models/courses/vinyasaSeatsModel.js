@@ -51,4 +51,5 @@ const vinyasaSeatsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+vinyasaSeatsSchema.index({ endDate: 1 }, { expireAfterSeconds: 0 });
 module.exports = mongoose.model("VinyasaSeats", vinyasaSeatsSchema);

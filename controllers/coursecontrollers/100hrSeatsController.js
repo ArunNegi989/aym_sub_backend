@@ -38,7 +38,12 @@ exports.create = async (req, res) => {
 ========================= */
 exports.getAll = async (req, res) => {
   try {
-    const data = await Seats.find().sort({ startDate: 1 });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // aaj ka din shuru se
+
+    const data = await Seats.find({
+      endDate: { $gte: today } // sirf wo batches jinka endDate aaj ya future mein ho
+    }).sort({ startDate: 1 });
 
     res.json({
       success: true,

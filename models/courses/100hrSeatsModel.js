@@ -55,5 +55,5 @@ const seatsSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+seatsSchema.index({ endDate: 1 }, { expireAfterSeconds: 0 });
 module.exports = mongoose.model("100hrSeats", seatsSchema);

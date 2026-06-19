@@ -53,4 +53,5 @@ const twoHundredBatchSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+twoHundredBatchSchema.index({ endDate: 1 }, { expireAfterSeconds: 0 });
 module.exports = mongoose.model("TwoHundredBatch", twoHundredBatchSchema);

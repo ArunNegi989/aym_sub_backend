@@ -90,9 +90,13 @@ exports.createBatch = async (req, res) => {
 ========================= */
 exports.getAll = async (req, res) => {
   try {
-    const batches = await PrenatalSeats.find().sort({ startDate: 1 });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    /* ✅ ADD AVAILABLE SEATS */
+    const batches = await PrenatalSeats.find({
+      endDate: { $gte: today }
+    }).sort({ startDate: 1 });
+
     const updated = batches.map((b) => ({
       ...b._doc,
       availableSeats: b.totalSeats - b.bookedSeats,
