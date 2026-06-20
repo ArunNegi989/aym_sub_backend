@@ -176,6 +176,9 @@ router.use("/testimonials/text", require("./Textreviewroutes"));
 router.use("/student-reviews", require("./studentReviewRoutes"));
 router.use("/video-reviews", require("./studentvideoReviewRoutes"));
 
+/* ============ online yoga course ==================*/
+
+router.use("/online-seats", require("./Onlineseatsroutes"));
 
 /* ===========================
    API HEALTH CHECK
